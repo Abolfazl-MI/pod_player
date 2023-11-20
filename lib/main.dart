@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pod_player/home_screen.dart';
 import 'package:pod_player/route_names.dart';
+import 'package:pod_player/splash_screen.dart';
 import 'package:pod_player/subscription_screen.dart';
 
 void main() {
@@ -14,13 +15,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       routes: {
         RouteNames.home: (context) => const HomeScreen(),
         RouteNames.sub: (context) => const Subscriptions(),
-        // RouteNames.
+        RouteNames.splash:(context)=>SplashScreen()
       },
-      initialRoute: RouteNames.sub,
+      initialRoute: RouteNames.splash,
       darkTheme: ThemeData.dark(),
       // themeMode: ThemeMode.dark,
       theme: ThemeData(
