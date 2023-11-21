@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pod_player/route_names.dart';
+import 'package:pod_player/app/config/router/route_names.dart';
 
 class DrawerOption {
   final String title;
