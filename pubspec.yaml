@@ -38,6 +38,8 @@ dependencies:
   dart_rss: ^3.0.1
   podcast_search: ^0.6.1
   flutter_svg: ^2.0.9
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
 
 dev_dependencies:
   flutter_test:
