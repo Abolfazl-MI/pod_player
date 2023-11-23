@@ -12,7 +12,7 @@ class SubscriptionProvider {
       await _isarInstance.subscriptionModels.put(model);
     });
   }
-
+// connectivity
   /// read all subscriptions
   Future<List<SubscriptionModel>> getAllSubs() async {
     return await _isarInstance.subscriptionModels.where().findAll();
