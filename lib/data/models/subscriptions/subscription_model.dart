@@ -11,9 +11,11 @@ class SubscriptionModel {
   String? artWorkUrl;
   // subscription link => feed link
   String? subscriptionUrl;
+  // constructor
   SubscriptionModel({
     this.artWorkUrl,
     this.subscriptionUrl,
     this.trackName,
   });
+  
 }

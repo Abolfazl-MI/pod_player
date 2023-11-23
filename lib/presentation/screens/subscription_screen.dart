@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pod_player/drawer_widget.dart';
+import 'package:pod_player/presentation/widgets/drawer_widget.dart';
 import 'package:pod_player/presentation/screens/single_pod_info.dart';
 
 import 'package:podcast_search/podcast_search.dart';

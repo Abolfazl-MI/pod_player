@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:pod_player/app/config/router/app_router.dart';
 
 import 'package:pod_player/app/config/router/route_names.dart';
+import 'package:pod_player/app/core/services/getit.dart';
 
-
-void main() {
+Future<void> main() async {
+  
+  WidgetsFlutterBinding.ensureInitialized();
+  // Decency injection
+  await setupLocator();
   runApp(const MyApp());
 }
 
@@ -29,15 +33,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
