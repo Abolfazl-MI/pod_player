@@ -93,10 +93,10 @@ SubscriptionModel _subscriptionModelDeserialize(
 ) {
   final object = SubscriptionModel(
     artWorkUrl: reader.readStringOrNull(offsets[0]),
+    id: id,
     subscriptionUrl: reader.readStringOrNull(offsets[1]),
     trackName: reader.readStringOrNull(offsets[2]),
   );
-  object.id = id;
   return object;
 }
 
@@ -119,7 +119,7 @@ P _subscriptionModelDeserializeProp<P>(
 }
 
 Id _subscriptionModelGetId(SubscriptionModel object) {
-  return object.id;
+  return object.id ?? Isar.autoIncrement;
 }
 
 List<IsarLinkBase<dynamic>> _subscriptionModelGetLinks(
@@ -369,7 +369,25 @@ extension SubscriptionModelQueryFilter
   }
 
   QueryBuilder<SubscriptionModel, SubscriptionModel, QAfterFilterCondition>
-      idEqualTo(Id value) {
+      idIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'id',
+      ));
+    });
+  }
+
+  QueryBuilder<SubscriptionModel, SubscriptionModel, QAfterFilterCondition>
+      idIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'id',
+      ));
+    });
+  }
+
+  QueryBuilder<SubscriptionModel, SubscriptionModel, QAfterFilterCondition>
+      idEqualTo(Id? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -380,7 +398,7 @@ extension SubscriptionModelQueryFilter
 
   QueryBuilder<SubscriptionModel, SubscriptionModel, QAfterFilterCondition>
       idGreaterThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -394,7 +412,7 @@ extension SubscriptionModelQueryFilter
 
   QueryBuilder<SubscriptionModel, SubscriptionModel, QAfterFilterCondition>
       idLessThan(
-    Id value, {
+    Id? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -408,8 +426,8 @@ extension SubscriptionModelQueryFilter
 
   QueryBuilder<SubscriptionModel, SubscriptionModel, QAfterFilterCondition>
       idBetween(
-    Id lower,
-    Id upper, {
+    Id? lower,
+    Id? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
