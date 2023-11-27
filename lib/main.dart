@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:isar/isar.dart';
+import 'package:pod_player/app/config/database/isar_run.dart';
 import 'package:pod_player/app/config/router/app_router.dart';
 
 import 'package:pod_player/app/config/router/route_names.dart';
 import 'package:pod_player/app/core/services/getit.dart';
 
 Future<void> main() async {
-  
   WidgetsFlutterBinding.ensureInitialized();
   // Decency injection
-  await setupLocator();
+  Isar isar = await initializeIsar();
+  await setupLocator(isar);
+  await locator.allReady();
   runApp(const MyApp());
 }
 

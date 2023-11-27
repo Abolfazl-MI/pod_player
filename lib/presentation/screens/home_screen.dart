@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pod_player/presentation/blocs/home_cubit/home_cubti.dart';
+import 'package:pod_player/presentation/blocs/home_cubit/home_state.dart';
 import 'package:pod_player/presentation/widgets/drawer_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -10,6 +13,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var drawerKey = GlobalKey<ScaffoldState>();
+  @override
+  void initState() {
+    super.initState();
+    context.read<HomeCubit>().loadHomeFeed();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,52 +29,99 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           title: const Text('PodPlayer'),
         ),
-        body: Container(
-          padding: EdgeInsets.all(8),
-          width: size.width,
-          height: size.height,
-          child: CustomScrollView(
-            slivers: [
-              SliverGrid(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    return Card(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: NetworkImage(
-                                      'https://media.khabaronline.ir/d/2023/03/08/3/5821498.jpg?ts=1678254396000',
-                                    ),
-                                    fit: BoxFit.fill),
-                              ),
-                            ),
+        body: BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
+          return switch (state) {
+            NoInternetConnection() => Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.signal_wifi_connected_no_internet_4_outlined,
+                      size: 50,
+                    ),
+                    Text('No Internet Connection'),
+                    TextButton(
+                      onPressed: () {
+                        context.read<HomeCubit>().loadHomeFeed();
+                      },
+                      child: Text('Try again'),
+                    )
+                  ],
+                ),
+              ),
+            HomeLoadingState() => Center(
+                  child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(
+                    color: Colors.red,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Loading...',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  )
+                ],
+              )),
+            HomeLoadedState() =>
+              state.subs.isEmpty ? EmptyState() : _body(state, size),
+            HomeErrorState() => Center(
+                child: Text('error'),
+              ),
+            HomeInitialState() => Container()
+          };
+        }),
+      ),
+    );
+  }
+
+  _body(HomeLoadedState state, Size size) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      width: size.width,
+      height: size.height,
+      child: CustomScrollView(
+        slivers: [
+          SliverGrid(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                return Card(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image: NetworkImage(
+                                  'https://media.khabaronline.ir/d/2023/03/08/3/5821498.jpg?ts=1678254396000',
+                                ),
+                                fit: BoxFit.fill),
                           ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                Text('Test-test$index'),
-                                Text('Test-test$index'),
-                              ],
-                            ),
-                          )
-                        ],
+                        ),
                       ),
-                    );
-                  }, childCount: 30),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: (size.width / 150).floor(),
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10))
-            ],
-          ),
-        ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Text('Test-test$index'),
+                            Text('Test-test$index'),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              }, childCount: state.subs.length),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: (size.width / 150).floor(),
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10))
+        ],
       ),
     );
   }
