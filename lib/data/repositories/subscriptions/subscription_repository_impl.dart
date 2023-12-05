@@ -56,7 +56,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       if (dataModel != null) {
         return DataSuccess(dataModel.toEntity());
       } else {
-        return DataFailed('پادکست مورد نظر یافت نشد');
+        return DataFailed('Failed to load podcast');
       }
     } catch (e) {
       debugPrint(e.toString());

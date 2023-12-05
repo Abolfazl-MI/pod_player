@@ -4,8 +4,8 @@ class PodcastProvider {
   /// load List<Item> from chart
   Future<podcast.SearchResult> loadChartFeed() async {
     //country default iran
-    podcast.Country country = podcast.Country.iran;
-    return await podcast.Search().charts(country: country, limit: 20);
+
+    return await podcast.Search().charts( limit: 20);
   }
 
   /// load podcast from feed url

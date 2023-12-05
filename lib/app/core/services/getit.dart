@@ -3,8 +3,11 @@ import 'package:get_it/get_it.dart';
 import 'package:isar/isar.dart';
 import 'package:pod_player/app/config/database/isar_run.dart';
 import 'package:pod_player/data/providers/data_source/local/connectivity/connectivity_provider.dart';
+import 'package:pod_player/data/providers/data_source/local/podcast_provider/podcast_provider.dart';
 import 'package:pod_player/data/providers/data_source/local/subscriptions/subscription_provider.dart';
+import 'package:pod_player/data/repositories/podcast/podcast_repository_impl.dart';
 import 'package:pod_player/data/repositories/subscriptions/subscription_repository_impl.dart';
+import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
 
 GetIt locator = GetIt.instance;
@@ -21,5 +24,11 @@ Future<void> setupLocator(Isar isar) async {
   // initialize connectivity instance
   locator.registerSingleton<Connectivity>(Connectivity());
   // initialize connectivity provider
-  locator.registerSingleton(ConnectivityProvider(locator<Connectivity>()));
+  locator.registerSingleton<ConnectivityProvider>(
+      ConnectivityProvider(locator<Connectivity>()));
+// initialize the podcast provider
+  locator.registerSingleton<PodcastProvider>(PodcastProvider());
+  // intialize podcast repository
+  locator.registerSingleton<PodcastRepository>(
+      PodcastRepositoryImpl(locator<PodcastProvider>()));
 }

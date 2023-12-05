@@ -19,7 +19,7 @@ class PodcastRepositoryImpl implements PodcastRepository{
         List<Item> podcastItems=searchResult.items;
         return DataSuccess(podcastItems);
       }
-      return const DataSuccess([]);
+     return DataFailed(searchResult.lastError);
     }
     catch(e){
       return const DataFailed('failed to load charts');

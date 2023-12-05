@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pod_player/app/core/resources/debouncer.dart';
+import 'package:pod_player/presentation/blocs/subscription/subscriptions_bloc.dart';
+import 'package:pod_player/presentation/blocs/subscription/subscriptions_bloc.dart';
 import 'package:pod_player/presentation/widgets/drawer_widget.dart';
 import 'package:pod_player/presentation/screens/single_pod_info.dart';
 
@@ -57,7 +61,7 @@ class _SubscriptionsState extends State<Subscriptions> {
     drawerKey = GlobalKey<ScaffoldState>();
     // TODO: implement initState
     super.initState();
-    _loadFeatureds();
+    context.read<SubscriptionsBloc>().add(LoadFeedEvent());
   }
 
   @override
@@ -69,112 +73,135 @@ class _SubscriptionsState extends State<Subscriptions> {
           title: const Text('Subscriptions'),
         ),
         drawer: DrawerWidget(drawerKey: drawerKey),
-        body: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-          width: size.width,
-          height: size.height,
-          child: Column(
-            children: [
-              TextFormField(
-                onFieldSubmitted: (query) async {
-                  if (query != null && query.isNotEmpty) {
-                    _searchPodcast(query);
-                  }
-                },
-                decoration: InputDecoration(
-                    prefixIcon: IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: () {
-                        // _loadFeatureds();
-                      },
-                    ),
-                    hintText: 'search podcast ...',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    )),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Expanded(
-                  child: Container(
-                // color: Colors.green,
-                child: isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.red,
-                        ),
-                      )
-                    : CustomScrollView(
-                        slivers: [
-                          // SliverList(
-                          //   delegate:
-                          //       SliverChildBuilderDelegate((context, index) {
-                          //     if (home_result.isEmpty) {
-                          //       return const Center(
-                          //         child: Text('no result'),
-                          //       );
-                          //     } else {
-                          //       Item item = home_result[index];
-                          //       return InkWell(
-                          //         onTap: () {
-                          //           Navigator.of(context).push(MaterialPageRoute(
-                          //               builder: (context) =>
-                          //                   SinglePodInfoScreen(item: item)));
-                          //         },
-                          //         child: Card(
-                          //           child: Padding(
-                          //               padding: const EdgeInsets.all(8.0),
-                          //               child: ListTile(
-                          //                 title: Text(item.trackName ?? ''),
-                          //                 subtitle:
-                          //                     Text(item.genre?.first.name ?? ''),
-                          //                 leading: Hero(
-                          //                   tag: 'artwork_hero',
-                          //                   child: Container(
-                          //                     width: 50,
-                          //                     height: 50,
-                          //                     decoration: BoxDecoration(
-                          //                         image: item.thumbnailArtworkUrl !=
-                          //                                 null
-                          //                             ? DecorationImage(
-                          //                                 image: NetworkImage(item
-                          //                                     .thumbnailArtworkUrl!))
-                          //                             : null),
-                          //                     // color: Colors.green
-                          //                   ),
-                          //                 ),
-                          //               )),
-                          //         ),
-                          //       );
-                          //     }
-                          //   }, childCount: home_result.length),
-                          // )
-                          SliverGrid(
-                            delegate:
-                                SliverChildBuilderDelegate((context, index) {
-                              Item item = search_result[index];
-                              if (search_result.isEmpty) {
-                                return Center(
-                                  child: Text('No result'),
-                                );
-                              } else {
-                                return SearchItem(item: item);
-                              }
-                            }, childCount: search_result.length),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: (size.width / 150).floor(),
-                            ),
-                          )
-                        ],
-                      ),
-              ))
-            ],
-          ),
+        body: BlocBuilder<SubscriptionsBloc, SubscriptionState>(
+          builder: (context, state) {
+            return switch (state) {
+              SubscriptionInitialState() => Container(),
+              SubscriptionLoadingState() => _body(state, size, context),
+              SubscriptionLoadedState() => _body(state, size, context),
+              //TODO: implement the time out and try again error
+              SubscriptionFailedState() => Center(
+                  child: Text('failed ${state.error}'),
+                )
+            };
+          },
         ),
       ),
     );
+  }
+
+  // _loading() {
+  //   return Expanded(
+  //     child: Container(
+  //       child: Center(
+  //         child: CircularProgressIndicator(
+  //           color: Colors.red,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  _body(SubscriptionState state, Size size, BuildContext context) {
+    Debouncer _debouncer = Debouncer(500);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      width: size.width,
+      height: size.height,
+      child: Column(
+        children: [
+          /// SEARCH BOX
+          TextFormField(
+            onChanged: (String? query) async {
+              print(query);
+              if (query != null && query.isNotEmpty) {
+                _debouncer.run(() {
+                  context.read<SubscriptionsBloc>().add(
+                        SearchPodcastEvent(
+                          query.trim(),
+                        ),
+                      );
+                });
+              }
+            },
+            decoration: InputDecoration(
+                prefixIcon: IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    // _loadFeatureds();
+                  },
+                ),
+                hintText: 'search podcast ...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                )),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          /// Loading state
+          if (state is SubscriptionLoadingState) ...[
+            Expanded(
+              child: Container(
+                child:Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.red,
+                  ),
+                )
+                // color: Colors.red,
+              ),
+            )
+          ],
+          /// loaded state
+          if (state is SubscriptionLoadedState) ...[
+            /// empty state
+            if (state.data.isEmpty)
+              Expanded(
+                  child: Container(
+                // color: Colors.red,
+                child: Center(
+                  child: Text(
+                    'No Result found ...',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium!
+                        .copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ))
+            else
+              /// full state
+              Expanded(
+                child: Container(
+                  // color: Colors.green,
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverGrid(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          Item item = state.data[index];
+                          return SearchItem(item: item);
+                        }, childCount: state.data.length),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: (size.width / 150).floor(),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              )
+          ]
+        ],
+      ),
+    );
+    // return Container(
+
+    //   child: Column(
+    //     children: [
+
+    //
+    //     ],
+    //   ),
+    // );
   }
 }
 

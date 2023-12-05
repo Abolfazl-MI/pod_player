@@ -12,6 +12,7 @@ class SubscriptionProvider {
       await _isarInstance.subscriptionModels.put(model);
     });
   }
+
 // connectivity
   /// read all subscriptions
   Future<List<SubscriptionModel>> getAllSubs() async {
@@ -26,5 +27,17 @@ class SubscriptionProvider {
   /// delete subscription
   void deleteSub({required int id}) {
     _isarInstance.subscriptionModels.deleteSync(id);
+  }
+
+  bool checkSub({required String feedUrl}) {
+    SubscriptionModel? result = _isarInstance.subscriptionModels
+        .filter()
+        .subscriptionUrlEqualTo(feedUrl)
+        .findFirstSync();
+    if (result != null) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
