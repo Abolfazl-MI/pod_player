@@ -15,10 +15,10 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
     try {
       await _subscriptionProvider.create(
           model: SubscriptionModel.fromEntity(entity));
-      return DataSuccess(true);
+      return const DataSuccess(true);
     } catch (e) {
       debugPrint(e.toString());
-      return DataFailed('در دنبال کردن این پادکست مشکلی پیش آمده است');
+      return const DataFailed('در دنبال کردن این پادکست مشکلی پیش آمده است');
     }
   }
 
@@ -26,11 +26,11 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
   DataState deleteSub({required int id}) {
     try {
       _subscriptionProvider.deleteSub(id: id);
-      return DataSuccess(true);
+      return const DataSuccess(true);
     } catch (e) {
       debugPrint(e.toString());
 
-      return DataFailed('مشکلی پیش امده بعدا تلاش کنید');
+      return const DataFailed('مشکلی پیش امده بعدا تلاش کنید');
     }
   }
 
@@ -44,7 +44,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
     } catch (e) {
       debugPrint(e.toString());
 
-      return DataFailed('مشکلی پیش آمده دوباره تلاش کنید');
+      return const DataFailed('SomeThing went wrong');
     }
   }
 
@@ -56,11 +56,21 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       if (dataModel != null) {
         return DataSuccess(dataModel.toEntity());
       } else {
-        return DataFailed('Failed to load podcast');
+        return const DataFailed('Failed to load podcast');
       }
     } catch (e) {
       debugPrint(e.toString());
-      return DataFailed('مشکلی پیش آمده دوباره تلاش کنید');
+      return const DataFailed('SomeThing went wrong');
+    }
+  }
+
+  @override
+  DataState<bool> checkSubscription({required String urlFeed}) {
+    try{
+      bool result=_subscriptionProvider.checkSub(feedUrl: urlFeed);
+      return DataSuccess(result);
+    }catch(e){
+      return const DataFailed('SomeThing went wrong');
     }
   }
 }

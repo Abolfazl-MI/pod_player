@@ -11,10 +11,10 @@ class ConnectivityProvider {
 
   Future<DataState<AppConnectivityStatus>> checkInternet() async {
     try {
-      ConnectivityResult _result = await _connectivity.checkConnectivity();
-      if (_result == ConnectivityResult.mobile ||
-          _result == ConnectivityResult.wifi ||
-          _result == ConnectivityResult.vpn) {
+      ConnectivityResult result = await _connectivity.checkConnectivity();
+      if (result == ConnectivityResult.mobile ||
+          result == ConnectivityResult.wifi ||
+          result == ConnectivityResult.vpn) {
         return const DataSuccess(AppConnectivityStatus.connected);
       } else {
         return const DataSuccess(AppConnectivityStatus.disconnected);

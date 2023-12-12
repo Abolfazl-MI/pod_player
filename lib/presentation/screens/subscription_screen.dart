@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pod_player/app/config/router/route_names.dart';
 import 'package:pod_player/app/core/resources/debouncer.dart';
-import 'package:pod_player/presentation/blocs/subscription/subscriptions_bloc.dart';
-import 'package:pod_player/presentation/blocs/subscription/subscriptions_bloc.dart';
+import 'package:pod_player/presentation/blocs/search/search_podcast_bloc.dart';
+
 import 'package:pod_player/presentation/widgets/drawer_widget.dart';
 import 'package:pod_player/presentation/screens/single_pod_info.dart';
 
@@ -61,7 +62,7 @@ class _SubscriptionsState extends State<Subscriptions> {
     drawerKey = GlobalKey<ScaffoldState>();
     // TODO: implement initState
     super.initState();
-    context.read<SubscriptionsBloc>().add(LoadFeedEvent());
+    context.read<SearchPodcastBloc>().add(LoadFeedEvent());
   }
 
   @override
@@ -73,7 +74,7 @@ class _SubscriptionsState extends State<Subscriptions> {
           title: const Text('Subscriptions'),
         ),
         drawer: DrawerWidget(drawerKey: drawerKey),
-        body: BlocBuilder<SubscriptionsBloc, SubscriptionState>(
+        body: BlocBuilder<SearchPodcastBloc, SearchState>(
           builder: (context, state) {
             return switch (state) {
               SubscriptionInitialState() => Container(),
@@ -102,8 +103,8 @@ class _SubscriptionsState extends State<Subscriptions> {
   //   );
   // }
 
-  _body(SubscriptionState state, Size size, BuildContext context) {
-    Debouncer _debouncer = Debouncer(500);
+  _body(SearchState state, Size size, BuildContext context) {
+    Debouncer debouncer = Debouncer(500);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       width: size.width,
@@ -115,8 +116,8 @@ class _SubscriptionsState extends State<Subscriptions> {
             onChanged: (String? query) async {
               print(query);
               if (query != null && query.isNotEmpty) {
-                _debouncer.run(() {
-                  context.read<SubscriptionsBloc>().add(
+                debouncer.run(() {
+                  context.read<SearchPodcastBloc>().add(
                         SearchPodcastEvent(
                           query.trim(),
                         ),
@@ -139,19 +140,21 @@ class _SubscriptionsState extends State<Subscriptions> {
           const SizedBox(
             height: 10,
           ),
+
           /// Loading state
           if (state is SubscriptionLoadingState) ...[
             Expanded(
               child: Container(
-                child:Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.red,
+                  child: const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.red,
+                ),
+              )
+                  // color: Colors.red,
                   ),
-                )
-                // color: Colors.red,
-              ),
             )
           ],
+
           /// loaded state
           if (state is SubscriptionLoadedState) ...[
             /// empty state
@@ -170,6 +173,7 @@ class _SubscriptionsState extends State<Subscriptions> {
                 ),
               ))
             else
+
               /// full state
               Expanded(
                 child: Container(
@@ -217,8 +221,10 @@ class SearchItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => SinglePodInfoScreen(item: item)));
+        Navigator.of(context).pushNamed(
+          RouteNames.podcastSingleInfo,
+          arguments: item
+        );
       },
       child: Card(
         // child: Padding(
@@ -262,7 +268,7 @@ class SearchItem extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Padding(

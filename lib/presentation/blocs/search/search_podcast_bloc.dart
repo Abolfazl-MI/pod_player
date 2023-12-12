@@ -1,33 +1,29 @@
-
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:pod_player/app/core/resources/data_state.dart';
-import 'package:pod_player/domain/entities/subscription/subscription_entity.dart';
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
 import 'package:podcast_search/podcast_search.dart';
-import 'package:rxdart/transformers.dart';
 
-part 'subscriptions_event.dart';
+part 'search_podcast_event.dart';
 
-part 'subscriptions_state.dart';
+part 'search_podcast_state.dart';
 
-class SubscriptionsBloc extends Bloc<SubscriptionsEvent, SubscriptionState> {
+class SearchPodcastBloc extends Bloc<SearchEvent, SearchState> {
   final SubscriptionRepository subscriptionRepository;
   final PodcastRepository podcastRepository;
 
-  SubscriptionsBloc(
+  SearchPodcastBloc(
       {required this.podcastRepository, required this.subscriptionRepository})
       : super(SubscriptionInitialState()) {
     on<LoadFeedEvent>(_loadFeedEvent);
     on<SearchPodcastEvent>(_searchEvent);
-    on<SubscribeToPodcast>(_subscribeToPodcast);
-    on<UnSubscribeToPodcast>(_unSubscribe);
-    on<CheckSubscriptionEvent>(_checkSub);
+    // on<SubscribeToPodcast>(_subscribeToPodcast);
+    // on<UnSubscribeToPodcast>(_unSubscribe);
+    // on<CheckSubscriptionEvent>(_checkSub);
   }
 
-  _loadFeedEvent(LoadFeedEvent event, Emitter<SubscriptionState> emit) async {
+  _loadFeedEvent(LoadFeedEvent event, Emitter<SearchState> emit) async {
     // emit loading state
     emit(SubscriptionLoadingState());
     // get data from repository
@@ -42,13 +38,13 @@ class SubscriptionsBloc extends Bloc<SubscriptionsEvent, SubscriptionState> {
     }
   }
 
-  _searchEvent(SearchPodcastEvent event,
-      Emitter<SubscriptionState> emit) async {
+  _searchEvent(
+      SearchPodcastEvent event, Emitter<SearchState> emit) async {
     // emit loading state
     emit(SubscriptionLoadingState());
     // search podcast from list of item
     DataState<List<Item>> podcasts =
-    await podcastRepository.searchPodcast(query: event.query);
+        await podcastRepository.searchPodcast(query: event.query);
     // if data state is succ
     if (podcasts is DataSuccess) {
       List<Item> data = podcasts.data!;
@@ -60,13 +56,21 @@ class SubscriptionsBloc extends Bloc<SubscriptionsEvent, SubscriptionState> {
     }
   }
 
-  _subscribeToPodcast(SubscribeToPodcast event,
-      Emitter<SubscriptionState> emit) {}
-
-  _unSubscribe(UnSubscribeToPodcast event, Emitter<SubscriptionState> emit) {
-
-  }
-
-  _checkSub(CheckSubscriptionEvent event, Emitter<SubscriptionState> emit) {
-  }
+  // /// this part would use in the single screen to handle the state of buttons
+  // _subscribeToPodcast(
+  //     SubscribeToPodcast event, Emitter<SubscriptionState> emit) async{
+  //   //emit the loading which would use for the button state
+  //   emit(SubscriptionLoadingState());
+  //   // try to subscribe to podcast
+  //   DataState subResult=await subscriptionRepository.createSub(entity:event.subscriptionEntity);
+  //   // emits loaded state which mean its successfully subscribed 
+  //   if(subResult is DataSuccess){
+  //     emit(SubscriptionLoadedState([]));
+  //   }
+  //  
+  // }
+  //
+  // _unSubscribe(UnSubscribeToPodcast event, Emitter<SubscriptionState> emit) {}
+  //
+  // _checkSub(CheckSubscriptionEvent event, Emitter<SubscriptionState> emit) {}
 }

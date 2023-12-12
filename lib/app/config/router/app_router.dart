@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pod_player/app/config/router/route_names.dart';
@@ -6,7 +8,9 @@ import 'package:pod_player/data/providers/data_source/local/connectivity/connect
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
 import 'package:pod_player/presentation/blocs/home_cubit/home_cubti.dart';
-import 'package:pod_player/presentation/blocs/subscription/subscriptions_bloc.dart';
+import 'package:pod_player/presentation/blocs/podcast_single/single_podcast_bloc.dart';
+import 'package:pod_player/presentation/blocs/search/search_podcast_bloc.dart';
+import 'package:pod_player/presentation/blocs/subscribe/subscription_cubit.dart';
 
 import '../../../presentation/screens/screens.dart';
 
@@ -18,11 +22,26 @@ class ApplicationRouter {
             subRepository: locator<SubscriptionRepository>()),
         child: const HomeScreen()),
     RouteNames.sub: (context) => BlocProvider(
-        create: (context)=>SubscriptionsBloc(
-          podcastRepository: locator<PodcastRepository>(),
-          subscriptionRepository: locator<SubscriptionRepository>()
-        ),
+        create: (context) => SearchPodcastBloc(
+            podcastRepository: locator<PodcastRepository>(),
+            subscriptionRepository: locator<SubscriptionRepository>()),
         child: const Subscriptions()),
-    RouteNames.splash: (context) => SplashScreen()
+    RouteNames.splash: (context) => const SplashScreen(),
+    RouteNames.podcastSingleInfo: (context) => MultiBlocProvider(
+          providers: [
+            BlocProvider<SubscriptionCubit>(
+              create: (context) => SubscriptionCubit(
+                subRepository: locator<SubscriptionRepository>(),
+              ),
+            ),
+            BlocProvider<SinglePodcastBloc>(
+              create: (context) => SinglePodcastBloc(
+                subscriptionRepository: locator<SubscriptionRepository>(),
+                podcastRepository: locator<PodcastRepository>(),
+              ),
+            )
+          ],
+          child: SinglePodInfoScreen(),
+        )
   };
 }

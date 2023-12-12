@@ -17,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     rotationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 800));
+        AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
     _rotationAnimation =
         Tween(begin: 0.0, end: -1.0).animate(rotationController);
     rotationController.forward();
@@ -37,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen>
         child: Center(
           child: RotationTransition(
             turns: _rotationAnimation,
-            child: Column(
+            child: const Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(

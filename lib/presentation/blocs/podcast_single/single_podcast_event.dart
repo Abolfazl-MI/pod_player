@@ -1,0 +1,36 @@
+part of 'single_podcast_bloc.dart';
+
+@immutable
+abstract class SinglePodcastEvent extends Equatable {}
+
+
+class LoadPodcastDetial extends SinglePodcastEvent{
+  final Item item;
+
+  LoadPodcastDetial(this.item);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [item];
+
+}
+
+class SubscribeToPodcast extends SinglePodcastEvent{
+  final SubscribeParam param;
+
+  SubscribeToPodcast(this.param);
+  @override
+  // TODO: implement props
+  List<Object?> get props => [param];
+}
+
+class UnSubscribeToPodcast extends SinglePodcastEvent{
+  final int id;
+
+  UnSubscribeToPodcast(this.id);
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw UnimplementedError();
+
+}
+

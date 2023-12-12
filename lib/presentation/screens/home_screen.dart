@@ -35,21 +35,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.signal_wifi_connected_no_internet_4_outlined,
                       size: 50,
                     ),
-                    Text('No Internet Connection'),
+                    const Text('No Internet Connection'),
                     TextButton(
                       onPressed: () {
                         context.read<HomeCubit>().loadHomeFeed();
                       },
-                      child: Text('Try again'),
+                      child: const Text('Try again'),
                     )
                   ],
                 ),
               ),
-            HomeLoadingState() => Center(
+            HomeLoadingState() => const Center(
                   child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -66,8 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               )),
             HomeLoadedState() =>
-              state.subs.isEmpty ? EmptyState() : _body(state, size),
-            HomeErrorState() => Center(
+              state.subs.isEmpty ? const EmptyState() : _body(state, size),
+            HomeErrorState() => const Center(
                 child: Text('error'),
               ),
             HomeInitialState() => Container()
@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Expanded(
                         child: Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             image: DecorationImage(
                                 image: NetworkImage(
                                   'https://media.khabaronline.ir/d/2023/03/08/3/5821498.jpg?ts=1678254396000',
@@ -101,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       Padding(
@@ -142,7 +142,7 @@ class EmptyState extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.podcasts,
                 size: 30,
               ),

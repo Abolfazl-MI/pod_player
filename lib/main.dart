@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:isar/isar.dart';
 import 'package:pod_player/app/config/database/isar_run.dart';
 import 'package:pod_player/app/config/router/app_router.dart';

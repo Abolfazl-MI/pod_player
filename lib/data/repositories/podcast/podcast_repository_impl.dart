@@ -1,56 +1,83 @@
-
 import 'package:pod_player/app/core/resources/data_state.dart';
+import 'package:pod_player/data/models/singlePodcast/single_podcast_info_model.dart';
 import 'package:pod_player/data/providers/data_source/local/podcast_provider/podcast_provider.dart';
+import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:podcast_search/podcast_search.dart';
-import 'package:podcast_search/src/model/item.dart';
-import 'package:podcast_search/src/model/podcast.dart';
 
-class PodcastRepositoryImpl implements PodcastRepository{
+class PodcastRepositoryImpl implements PodcastRepository {
   final PodcastProvider _podcastProvider;
 
   PodcastRepositoryImpl(this._podcastProvider);
 
   @override
-  Future<DataState<List<Item>>> loadChartFeed() async{
-    try{
-      SearchResult searchResult=await _podcastProvider.loadChartFeed();
-      if(searchResult.successful){
-        List<Item> podcastItems=searchResult.items;
+  Future<DataState<List<Item>>> loadChartFeed() async {
+    try {
+      SearchResult searchResult = await _podcastProvider.loadChartFeed();
+      if (searchResult.successful) {
+        List<Item> podcastItems = searchResult.items;
         return DataSuccess(podcastItems);
       }
-     return DataFailed(searchResult.lastError);
-    }
-    catch(e){
+      return DataFailed(searchResult.lastError);
+    } catch (e) {
       return const DataFailed('failed to load charts');
     }
   }
 
   @override
-  Future<DataState<Podcast>> loadPodcastFromFeed({required String feedUrl})async {
-    try{
-      Podcast podcast= await _podcastProvider.loadPodcastFromFeed(feedUrl: feedUrl);
-      return DataSuccess(podcast);
-    }catch(e){
-      if(e is PodcastTimeoutException){
-        return const DataFailed('Network Timeout on loading');
+  Future<DataState<SinglePodcastEntity>> loadPodcastFromItem(
+      {required Item item}) async {
+    try {
+      // podcast instance which load from feed url
+      Podcast podcast =
+          await _podcastProvider.loadPodcastFromFeed(feedUrl: item.feedUrl!);
+      // load similar items
+      DataState<List<Item>> similarItems =
+          await loadSimilarPodcasts(genre: item.primaryGenreName!);
+
+      // after loading we create model
+      SinglePodcastModel? singlePodcastModel;
+      //if we could load similars we would add else we wont
+      if (similarItems is DataSuccess) {
+        singlePodcastModel = SinglePodcastModel.fromData(item, podcast,
+            similarItem: similarItems.data);
+      } else {
+        singlePodcastModel = SinglePodcastModel.fromData(item, podcast);
       }
-      return const DataFailed('SomeThing went wrong');
+      return DataSuccess(singlePodcastModel.toEntity());
+    } catch (e) {
+      return const DataFailed("SomeThing went wrong");
     }
   }
 
   @override
-  Future<DataState<List<Item>>> searchPodcast({required String query})async {
-    try{
-      SearchResult result=await _podcastProvider.searchPodcast(query: query);
-      if(result.successful) {
-        List<Item>searchResult = result.items;
+  Future<DataState<List<Item>>> searchPodcast({required String query}) async {
+    try {
+      SearchResult result = await _podcastProvider.searchPodcast(query: query);
+      if (result.successful) {
+        List<Item> searchResult = result.items;
         return DataSuccess(searchResult);
       }
       return const DataSuccess([]);
-    }catch(e){
-      return  const DataFailed('Something went wrong');
+    } catch (e) {
+      return const DataFailed('Something went wrong');
     }
   }
+
+  @override
+  Future<DataState<List<Item>>> loadSimilarPodcasts(
+      {required String genre}) async {
+    try {
+      SearchResult result =
+          await _podcastProvider.loadSimilarPodcasts(genre: genre);
+      if (result.successful) {
+        return DataSuccess(result.items);
+      }
+      return DataFailed('SomeThing went wrong');
+    } catch (e) {
+      return DataFailed('SomeThing went wrong');
+    }
+  }
+
 
 }

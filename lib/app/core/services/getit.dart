@@ -1,7 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get_it/get_it.dart';
 import 'package:isar/isar.dart';
-import 'package:pod_player/app/config/database/isar_run.dart';
 import 'package:pod_player/data/providers/data_source/local/connectivity/connectivity_provider.dart';
 import 'package:pod_player/data/providers/data_source/local/podcast_provider/podcast_provider.dart';
 import 'package:pod_player/data/providers/data_source/local/subscriptions/subscription_provider.dart';

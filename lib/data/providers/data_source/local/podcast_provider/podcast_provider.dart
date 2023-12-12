@@ -5,7 +5,7 @@ class PodcastProvider {
   Future<podcast.SearchResult> loadChartFeed() async {
     //country default iran
 
-    return await podcast.Search().charts( limit: 20);
+    return await podcast.Search().charts(limit: 20);
   }
 
   /// load podcast from feed url
@@ -14,7 +14,14 @@ class PodcastProvider {
   }
 
   /// search podcast by term sent
-  Future<podcast.SearchResult>searchPodcast({required String query})async{
+  Future<podcast.SearchResult> searchPodcast({required String query}) async {
     return await podcast.Search().search(query);
   }
+
+  /// load similar podcast by genere
+  Future<podcast.SearchResult> loadSimilarPodcasts(
+      {required String genre}) async {
+    return await podcast.Search().charts(limit: 5, genre: genre);
+  }
+
 }
