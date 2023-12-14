@@ -35,31 +35,6 @@ final class SinglePodError extends SinglePodcastState {
   List<Object?> get props => [error];
 }
 
-final class SinglePodSimilarPodLoading extends SinglePodcastState {
-  @override
-  // TODO: implement props
-  List<Object?> get props => [];
-}
-
-final class SinglePodSimilarPodLoaded extends SinglePodcastState {
-  final List<Item> data;
-
-  SinglePodSimilarPodLoaded(this.data);
-
-  @override
-  // TODO: implement props
-  List<Object?> get props => [data];
-}
-
-final class SinglePodSimilarPodFailed extends SinglePodcastState {
-  final String error;
-
-  SinglePodSimilarPodFailed(this.error);
-
-  @override
-  // TODO: implement props
-  List<Object?> get props => [];
-}
 
 final class SinglePodSubLoading extends SinglePodcastState {
   @override

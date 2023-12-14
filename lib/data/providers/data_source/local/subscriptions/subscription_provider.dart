@@ -40,4 +40,10 @@ class SubscriptionProvider {
       return false;
     }
   }
+  /// delete subscription with feed url
+  void deleteSubWithFeedUrl({required String feedUrl}){
+     _isarInstance.writeTxnSync((){
+       _isarInstance.subscriptionModels.filter().subscriptionUrlEqualTo(feedUrl).deleteFirstSync();
+     });
+  }
 }

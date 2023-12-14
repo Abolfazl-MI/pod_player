@@ -73,4 +73,14 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       return const DataFailed('SomeThing went wrong');
     }
   }
+
+  @override
+  DataState deleteSubWithUrl({required String feedUrl}) {
+   try{
+     var result=_subscriptionProvider.deleteSubWithFeedUrl(feedUrl: feedUrl);
+     return const DataSuccess(true);
+   }catch(e){
+     return const DataFailed('Something went wrong');
+   }
+  }
 }

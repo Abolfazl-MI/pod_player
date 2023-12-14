@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -21,19 +23,20 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
     required this.podcastRepository,
   }) : super(SinglePodInitialState()) {
     on<LoadPodcastDetial>(_loadDetails);
+    on<CheckSubscription>(_checkSubscription);
   }
 
-  void _loadDetails(
-      LoadPodcastDetial event, Emitter<SinglePodcastState> emit) async {
+  void _loadDetails(LoadPodcastDetial event,
+      Emitter<SinglePodcastState> emit) async {
     emit(SinglePodLoadingState());
     DataState<SinglePodcastEntity> result =
-        await podcastRepository.loadPodcastFromItem(item: event.item);
+    await podcastRepository.loadPodcastFromItem(item: event.item);
     if (result is DataSuccess) {
       DataState<List<Item>> simillarItems =
-          await podcastRepository.loadSimilarPodcasts(
-              genre: event.item.primaryGenreName ??
-                  result.data?.genres?.first.name ??
-                  'podcast');
+      await podcastRepository.loadSimilarPodcasts(
+          genre: event.item.primaryGenreName ??
+              result.data?.genres?.first.name ??
+              'podcast');
 
       emit(
         SinglePodLoaded(
@@ -100,4 +103,29 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
 //     emit(SinglePodSimilarPodFailed('Some thing went wrong'));
 //   }
 // }
+
+  _checkSubscription(CheckSubscription event,
+      Emitter<SinglePodcastState> emit) async {
+    emit(SinglePodSubLoading());
+    // delay for sec
+    await Future.delayed(const Duration(seconds: 2));
+    //check sub
+    DataState<bool>subResult = subscriptionRepository.checkSubscription(
+        urlFeed: event.urlFeed);
+    // if there is no error
+    if (subResult is DataSuccess) {
+      // check if subscribed or not
+      bool hasSubscribed = subResult.data ?? false;
+      if (hasSubscribed) {
+        emit(SinglePodSubscribed());
+      } else {
+        emit(SinglePodUnSubscribed());
+      }
+    }else{
+      emit(SinglePodSubFailed('something went wrong'));
+      await Future.delayed(const Duration(seconds: 1));
+      emit(SinglePodUnSubscribed());
+
+    }
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:pod_player/app/core/resources/data_state.dart';
+import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
 import 'package:pod_player/domain/entities/subscription/subscription_entity.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
 
@@ -11,7 +12,12 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
   SubscriptionCubit({required this.subRepository})
       : super(SubscriptionState.initial);
 
-  subscribeToPodcast({required SubscriptionEntity subscriptionEntity})async{
+  subscribeToPodcast({required SinglePodcastEntity singlePodcastEntity})async{
+    SubscriptionEntity subscriptionEntity=SubscriptionEntity(
+      trackName: singlePodcastEntity.podcastName,
+      artWorkUrl: singlePodcastEntity.image,
+      subscriptionUrl: singlePodcastEntity.feedUrl
+    );
     /// loading state
     emit(SubscriptionState.loading);
     await Future.delayed(const Duration(seconds: 2));
@@ -26,24 +32,24 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
       emit(SubscriptionState.unsibscribed);
     }
   }
-  unSubscribeToPodcast({required int id})async{
+  unSubscribeToPodcast({required String feedUrl})async{
     /// loading state
     emit(SubscriptionState.loading);
     await Future.delayed(const Duration(seconds: 2));
 
     /// try to add sub
-    DataState result= subRepository.deleteSub(id: id);
+    DataState result= subRepository.deleteSubWithUrl(feedUrl: feedUrl);
     /// check if subscription success to emit initial state
     if(result is DataSuccess){
-      emit(SubscriptionState.subscribed);
+      emit(SubscriptionState.unsibscribed);
     }else{
       emit(SubscriptionState.error);
       emit(SubscriptionState.unsibscribed);
     }
   }
-  checkSubscription({required String urlFeed}){
+  checkSubscription({required String urlFeed})async{
     emit(SubscriptionState.loading);
-     Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
     DataState<bool> result= subRepository.checkSubscription(urlFeed: urlFeed);
     if(result is DataSuccess){
       if(result.data==true){
