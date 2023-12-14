@@ -73,9 +73,9 @@ class PodcastRepositoryImpl implements PodcastRepository {
       if (result.successful) {
         return DataSuccess(result.items);
       }
-      return DataFailed('SomeThing went wrong');
+      return const DataFailed('SomeThing went wrong');
     } catch (e) {
-      return DataFailed('SomeThing went wrong');
+      return const DataFailed('SomeThing went wrong');
     }
   }
 

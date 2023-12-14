@@ -5,7 +5,6 @@ import 'package:pod_player/app/core/resources/debouncer.dart';
 import 'package:pod_player/presentation/blocs/search/search_podcast_bloc.dart';
 
 import 'package:pod_player/presentation/widgets/drawer_widget.dart';
-import 'package:pod_player/presentation/screens/single_pod_info.dart';
 
 import 'package:podcast_search/podcast_search.dart';
 

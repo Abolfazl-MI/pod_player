@@ -41,7 +41,7 @@ class ApplicationRouter {
               ),
             )
           ],
-          child: SinglePodInfoScreen(),
+          child: const SinglePodInfoScreen(),
         )
   };
 }

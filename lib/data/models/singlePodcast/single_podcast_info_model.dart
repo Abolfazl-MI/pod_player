@@ -80,7 +80,7 @@ class SinglePodcastModel extends Equatable {
       episodes: episodes,
       genres: genres,
       subscribed: subscribed,
-      similarItems: this.similarItems,
+      similarItems: similarItems,
       podcastName: podcastName,
       trackCensoredName: trackCensoredName);
 }

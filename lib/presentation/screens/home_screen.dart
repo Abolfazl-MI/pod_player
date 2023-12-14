@@ -92,10 +92,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Expanded(
                         child: Container(
-                          decoration: const BoxDecoration(
+                          decoration:  BoxDecoration(
                             image: DecorationImage(
                                 image: NetworkImage(
-                                  'https://media.khabaronline.ir/d/2023/03/08/3/5821498.jpg?ts=1678254396000',
+                                  state.subs[index].artWorkUrl!,
                                 ),
                                 fit: BoxFit.fill),
                           ),
@@ -108,8 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
                           children: [
-                            Text('Test-test$index'),
-                            Text('Test-test$index'),
+                            Text(state.subs[index].trackName!),
+                            // Text('Test-test$index'),
                           ],
                         ),
                       )
