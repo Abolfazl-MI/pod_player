@@ -24,6 +24,7 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
   }) : super(SinglePodInitialState()) {
     on<LoadPodcastDetial>(_loadDetails);
     on<CheckSubscription>(_checkSubscription);
+    on<LoadPodcastFromFeed>(_loadFromFeed);
   }
 
   void _loadDetails(LoadPodcastDetial event,
@@ -48,6 +49,7 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
       emit(SinglePodError('Something went wrong'));
     }
   }
+
 
 //   // loading
 //   emit(SinglePodLoadingState());
@@ -126,6 +128,16 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
       await Future.delayed(const Duration(seconds: 1));
       emit(SinglePodUnSubscribed());
 
+    }
+  }
+
+ _loadFromFeed(LoadPodcastFromFeed event, Emitter<SinglePodcastState> emit) async{
+    emit(SinglePodLoadingState());
+    DataState<SinglePodcastEntity> result=await podcastRepository.loadPodcastFromFeed(feedUrl: event.feedUrl);
+    if(result is DataSuccess){
+      emit(SinglePodLoaded(result.data!, []));
+    }else{
+      emit(SinglePodSubFailed('SomeThing went wrong'));
     }
   }
 }

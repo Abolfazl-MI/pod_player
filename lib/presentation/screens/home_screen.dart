@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pod_player/app/config/router/route_names.dart';
 import 'package:pod_player/presentation/blocs/home_cubit/home_cubti.dart';
 import 'package:pod_player/presentation/blocs/home_cubit/home_state.dart';
 import 'package:pod_player/presentation/widgets/drawer_widget.dart';
@@ -13,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var drawerKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -86,34 +88,42 @@ class _HomeScreenState extends State<HomeScreen> {
         slivers: [
           SliverGrid(
               delegate: SliverChildBuilderDelegate((context, index) {
-                return Card(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration:  BoxDecoration(
-                            image: DecorationImage(
-                                image: NetworkImage(
-                                  state.subs[index].artWorkUrl!,
-                                ),
-                                fit: BoxFit.fill),
+                return InkWell(
+                  onTap: () {
+                    Navigator.of(context).pushNamed(
+                      RouteNames.podcastSingle,
+                      arguments: state.subs[index].subscriptionUrl
+                    );
+                  },
+                  child: Card(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image: NetworkImage(
+                                    state.subs[index].artWorkUrl!,
+                                  ),
+                                  fit: BoxFit.fill),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Text(state.subs[index].trackName!),
-                            // Text('Test-test$index'),
-                          ],
+                        const SizedBox(
+                          height: 10,
                         ),
-                      )
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Text(state.subs[index].trackName!),
+                              // Text('Test-test$index'),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 );
               }, childCount: state.subs.length),

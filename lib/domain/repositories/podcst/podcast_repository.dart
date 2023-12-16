@@ -12,4 +12,6 @@ abstract interface class PodcastRepository {
   Future<DataState<SinglePodcastEntity>> loadPodcastFromItem(
       {required podcast.Item item});
   Future<DataState<List<podcast.Item>>>loadSimilarPodcasts({required String genre});
+
+  Future<DataState<SinglePodcastEntity>>loadPodcastFromFeed({required String feedUrl});
 }

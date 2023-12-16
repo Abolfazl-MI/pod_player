@@ -71,6 +71,15 @@ class SinglePodcastModel extends Equatable {
           podcastName: entity.podcastName,
           trackCensoredName: entity.trackCensoredName);
 
+  factory SinglePodcastModel.fromRawPodcast(Podcast podcast) =>
+      SinglePodcastModel(
+        feedUrl: podcast.link,
+        podcastName: podcast.title,
+        episodes: podcast.episodes,
+        image: podcast.image,
+        description: podcast.description,
+      );
+
   SinglePodcastEntity toEntity() => SinglePodcastEntity(
       feedUrl: feedUrl,
       releaseDate: releaseDate,

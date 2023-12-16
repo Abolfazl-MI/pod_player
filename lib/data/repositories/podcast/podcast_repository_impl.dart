@@ -79,5 +79,17 @@ class PodcastRepositoryImpl implements PodcastRepository {
     }
   }
 
-
+  @override
+  Future<DataState<SinglePodcastEntity>> loadPodcastFromFeed(
+      {required String feedUrl}) async {
+    try {
+      Podcast podcast =
+          await _podcastProvider.loadPodcastFromFeed(feedUrl: feedUrl);
+      SinglePodcastModel singlePodcastModel =
+          SinglePodcastModel.fromRawPodcast(podcast);
+      return DataSuccess(singlePodcastModel.toEntity());
+    } catch (e) {
+      return const DataFailed('SomeThing went wrong');
+    }
+  }
 }

@@ -41,3 +41,12 @@ class CheckSubscription extends SinglePodcastEvent {
   @override
   List<Object?> get props => [];
 }
+
+final class LoadPodcastFromFeed extends SinglePodcastEvent {
+  final String feedUrl;
+
+  LoadPodcastFromFeed(this.feedUrl);
+
+  @override
+  List<Object?> get props => [feedUrl];
+}

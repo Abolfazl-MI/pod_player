@@ -1,16 +1,16 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pod_player/app/config/router/route_names.dart';
 import 'package:pod_player/app/core/services/getit.dart';
 import 'package:pod_player/data/providers/data_source/local/connectivity/connectivity_provider.dart';
+import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
 import 'package:pod_player/presentation/blocs/home_cubit/home_cubti.dart';
 import 'package:pod_player/presentation/blocs/podcast_single/single_podcast_bloc.dart';
 import 'package:pod_player/presentation/blocs/search/search_podcast_bloc.dart';
 import 'package:pod_player/presentation/blocs/subscribe/subscription_cubit.dart';
+import 'package:pod_player/presentation/screens/podcast_single.dart';
 
 import '../../../presentation/screens/screens.dart';
 
@@ -42,6 +42,13 @@ class ApplicationRouter {
             )
           ],
           child: const SinglePodInfoScreen(),
+        ),
+    RouteNames.podcastSingle: (context) => BlocProvider(
+          create: (context) => SinglePodcastBloc(
+            subscriptionRepository: locator<SubscriptionRepository>(),
+            podcastRepository: locator<PodcastRepository>(),
+          ),
+          child: PodcastSingleScreen(),
         )
   };
 }
