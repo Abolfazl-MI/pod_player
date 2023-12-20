@@ -10,6 +10,7 @@ import 'package:pod_player/presentation/blocs/home_cubit/home_cubti.dart';
 import 'package:pod_player/presentation/blocs/podcast_single/single_podcast_bloc.dart';
 import 'package:pod_player/presentation/blocs/search/search_podcast_bloc.dart';
 import 'package:pod_player/presentation/blocs/subscribe/subscription_cubit.dart';
+import 'package:pod_player/presentation/screens/player_screen.dart';
 import 'package:pod_player/presentation/screens/podcast_single.dart';
 
 import '../../../presentation/screens/screens.dart';
@@ -49,6 +50,7 @@ class ApplicationRouter {
             podcastRepository: locator<PodcastRepository>(),
           ),
           child: PodcastSingleScreen(),
-        )
+        ),
+    RouteNames.playerScreen: (context) => PlayerScreen()
   };
 }

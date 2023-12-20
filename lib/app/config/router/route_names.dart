@@ -4,4 +4,5 @@ class RouteNames {
   static String splash = 'splash';
   static String podcastSingleInfo='singlePodInfo';
   static String podcastSingle='podcastSingle';
+  static String playerScreen='playerScreen';
 }

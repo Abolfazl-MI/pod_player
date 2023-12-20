@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:pod_player/app/config/router/route_names.dart';
 import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
 import 'package:pod_player/presentation/blocs/podcast_single/single_podcast_bloc.dart';
+import 'package:pod_player/presentation/widgets/draggableSheet.dart';
 import 'package:podcast_search/podcast_search.dart';
 
 class PodcastSingleScreen extends StatefulWidget {
@@ -28,22 +30,23 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
     return BlocBuilder<SinglePodcastBloc, SinglePodcastState>(
       builder: (context, state) {
         return Scaffold(
-          appBar: state is SinglePodLoaded
-              ? AppBar(
-                  title: Text(state.singlePodcastEntity.podcastName ?? ''),
-                )
-              : null,
-          body: _handleBodyState(state, MediaQuery.of(context).size,context)
-        );
+            bottomNavigationBar: state is SinglePodLoaded
+                ? PlayerBottemSheet(
+                    singlePodcastEntity: state.singlePodcastEntity,
+                  )
+                : null,
+            appBar: state is SinglePodLoaded
+                ? AppBar(
+                    title: Text(state.singlePodcastEntity.podcastName ?? ''),
+                  )
+                : null,
+            body:
+                _handleBodyState(state, MediaQuery.of(context).size, context));
       },
     );
   }
 
-  _handleBodyState(
-    SinglePodcastState state,
-    Size size,
-      BuildContext context
-  ) {
+  _handleBodyState(SinglePodcastState state, Size size, BuildContext context) {
     return SizedBox(
         width: size.width,
         height: size.height,
@@ -52,7 +55,7 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
             : state is SinglePodError
                 ? _failedToLoadState(state.error)
                 : state is SinglePodLoaded
-                    ? _body(size, state,context)
+                    ? _body(size, state, context)
                     : Container());
   }
 
@@ -70,7 +73,7 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
     );
   }
 
-  _body(Size size, SinglePodLoaded state,BuildContext context) {
+  _body(Size size, SinglePodLoaded state, BuildContext context) {
     SinglePodcastEntity singlePodcastEntity = state.singlePodcastEntity;
     return CustomScrollView(
       slivers: [
@@ -150,9 +153,22 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
                 return Card(
                   child: ListTile(
                     title: Text(episode.title),
-                    trailing: IconButton(
-                      icon: Icon(Icons.play_arrow),
-                      onPressed: () {},
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.play_arrow),
+                          onPressed: () {
+                            // debugPrint(singlePodcastEntity.episodes.toString());
+                            List<Episode>episodes=singlePodcastEntity.episodes!;
+                            // debugPrint(episodes[index].);
+                            Navigator.of(context).pushNamed(RouteNames.playerScreen,arguments: episodes[index]);
+                          },
+                        ), IconButton(
+                          icon: Icon(Icons.download),
+                          onPressed: () {},
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -169,22 +185,131 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
         SliverToBoxAdapter(
           child: Container(
             width: size.width,
-            height: size.height*0.08,
+            height: size.height * 0.08,
             // color: Colors.black,
             child: Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-
                 children: [
                   Icon(Icons.podcasts),
-                  SizedBox(width: 10,),
-                  Text('PodPlayer',style: Theme.of(context).textTheme.bodySmall,)
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    'PodPlayer',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  )
                 ],
               ),
             ),
           ),
         )
       ],
+    );
+  }
+}
+
+class PlayerBottemSheet extends StatelessWidget {
+  const PlayerBottemSheet({Key? key, required this.singlePodcastEntity})
+      : super(key: key);
+  final SinglePodcastEntity singlePodcastEntity;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(color: Theme.of(context).cardColor, boxShadow: [
+        BoxShadow(
+            color: Colors.black, blurRadius: 8, blurStyle: BlurStyle.inner)
+      ]),
+      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.07,
+      // color: Colors.red,
+      child: Row(
+        children: [
+          /// image
+          Container(
+            decoration: BoxDecoration(
+              image:DecorationImage(
+                image: NetworkImage(singlePodcastEntity.image!),
+                fit: BoxFit.cover
+              )
+            ),
+            // color: Colors.green,
+            width: MediaQuery.of(context).size.width * 0.2,
+            height: MediaQuery.of(context).size.height * 0.07,
+          ),
+          SizedBox(
+            width: 5,
+          ),
+
+          /// title description
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                 singlePodcastEntity.podcastName?? 'this is title',
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  singlePodcastEntity.description??'this is description im writing here',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          Row(
+            children: [
+              IconButton(onPressed: () {}, icon: Icon(Icons.skip_previous)),
+              IconButton(onPressed: () {}, icon: Icon(Icons.play_arrow)),
+              IconButton(onPressed: () {}, icon: Icon(Icons.skip_next))
+            ],
+          )
+        ],
+      ),
+      // child: Row(
+      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //
+      //   // mainAxisAlignment: MainAxisAlignment.center,
+      //   children: [
+      //     Row(
+      //       children: [
+      //         Container(
+      //           width: MediaQuery.of(context).size.width * 0.2,
+      //           height: MediaQuery.of(context).size.height * 0.07,
+      //           color: Colors.green,
+      //         ),
+      //         SizedBox(
+      //           width: 5,
+      //         ),
+      //
+      //         Column(
+      //           crossAxisAlignment: CrossAxisAlignment.start,
+      //           mainAxisAlignment: MainAxisAlignment.center,
+      //           children: [
+      //             Text('This is title'),
+      //             Text(
+      //               'This is description which im writing!',
+      //               maxLines: 10,
+      //               overflow: TextOverflow.ellipsis,
+      //             ),
+      //           ],
+      //         ),
+      //       ],
+      //     ),
+      //     Row(
+      //       children: [
+      //         IconButton(
+      //             onPressed: () {}, icon: Icon(Icons.skip_previous)),
+      //         IconButton(
+      //             onPressed: () {}, icon: Icon(Icons.play_arrow)),
+      //         IconButton(onPressed: () {}, icon: Icon(Icons.skip_next)),
+      //       ],
+      //     )
+      //   ],
+      // ),
     );
   }
 }

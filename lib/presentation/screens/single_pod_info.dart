@@ -5,6 +5,7 @@ import 'package:pod_player/app/config/router/router.dart';
 import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
 import 'package:pod_player/presentation/blocs/podcast_single/single_podcast_bloc.dart';
 import 'package:pod_player/presentation/blocs/subscribe/subscription_cubit.dart';
+import 'package:pod_player/presentation/widgets/draggableSheet.dart';
 import 'package:podcast_search/podcast_search.dart';
 import 'package:flutter_html/flutter_html.dart';
 
@@ -88,6 +89,7 @@ class _SinglePodInfoScreenState extends State<SinglePodInfoScreen> {
           print(state);
 
           return Scaffold(
+
               appBar: AppBar(
                 title: state is SinglePodLoaded
                     ? Text(state.singlePodcastEntity.trackCensoredName ?? '')
