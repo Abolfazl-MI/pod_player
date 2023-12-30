@@ -1,6 +1,8 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get_it/get_it.dart';
 import 'package:isar/isar.dart';
+import 'package:pod_player/data/providers/data_source/local/audio_service/audio_service.dart';
 import 'package:pod_player/data/providers/data_source/local/connectivity/connectivity_provider.dart';
 import 'package:pod_player/data/providers/data_source/local/podcast_provider/podcast_provider.dart';
 import 'package:pod_player/data/providers/data_source/local/subscriptions/subscription_provider.dart';
@@ -8,12 +10,19 @@ import 'package:pod_player/data/repositories/podcast/podcast_repository_impl.dar
 import 'package:pod_player/data/repositories/subscriptions/subscription_repository_impl.dart';
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
+import 'package:pod_player/presentation/blocs/player/player_controller.dart';
 
 GetIt locator = GetIt.instance;
 
 Future<void> setupLocator(Isar isar) async {
   // isar instance
   locator.registerSingleton<Isar>(isar);
+  // handler class registration
+  locator.registerSingleton<MyAudioHandler>(MyAudioHandler());
+  // audio player
+  locator.registerSingleton(await initAudioServices());
+  /// player controller
+  locator.registerSingleton<PlayerController>(PlayerController(locator<MyAudioHandler>()));
   //  initialize sub provider
   locator.registerSingleton<SubscriptionProvider>(
       SubscriptionProvider(locator<Isar>()));
@@ -30,4 +39,5 @@ Future<void> setupLocator(Isar isar) async {
   // intialize podcast repository
   locator.registerSingleton<PodcastRepository>(
       PodcastRepositoryImpl(locator<PodcastProvider>()));
+
 }

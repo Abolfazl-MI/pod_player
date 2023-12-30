@@ -1,13 +1,18 @@
 import 'dart:async';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
 import 'package:pod_player/app/core/params/subscribe_param.dart';
 import 'package:pod_player/app/core/resources/data_state.dart';
+import 'package:pod_player/app/core/services/getit.dart';
+import 'package:pod_player/data/providers/data_source/local/audio_service/audio_service.dart';
 import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
+import 'package:pod_player/presentation/blocs/player/player_controller.dart';
 import 'package:podcast_search/podcast_search.dart';
 
 part 'single_podcast_event.dart';
@@ -17,27 +22,30 @@ part 'single_podcast_state.dart';
 class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
   final SubscriptionRepository subscriptionRepository;
   final PodcastRepository podcastRepository;
+  final MyAudioHandler audioHandler;
 
-  SinglePodcastBloc({
-    required this.subscriptionRepository,
-    required this.podcastRepository,
-  }) : super(SinglePodInitialState()) {
+  SinglePodcastBloc(
+      {required this.subscriptionRepository,
+      required this.podcastRepository,
+      required this.audioHandler})
+      : super(SinglePodInitialState()) {
     on<LoadPodcastDetial>(_loadDetails);
     on<CheckSubscription>(_checkSubscription);
     on<LoadPodcastFromFeed>(_loadFromFeed);
+    on<LoadPlayListForPlayer>(_loadPlayList);
   }
 
-  void _loadDetails(LoadPodcastDetial event,
-      Emitter<SinglePodcastState> emit) async {
+  void _loadDetails(
+      LoadPodcastDetial event, Emitter<SinglePodcastState> emit) async {
     emit(SinglePodLoadingState());
     DataState<SinglePodcastEntity> result =
-    await podcastRepository.loadPodcastFromItem(item: event.item);
+        await podcastRepository.loadPodcastFromItem(item: event.item);
     if (result is DataSuccess) {
       DataState<List<Item>> simillarItems =
-      await podcastRepository.loadSimilarPodcasts(
-          genre: event.item.primaryGenreName ??
-              result.data?.genres?.first.name ??
-              'podcast');
+          await podcastRepository.loadSimilarPodcasts(
+              genre: event.item.primaryGenreName ??
+                  result.data?.genres?.first.name ??
+                  'podcast');
 
       emit(
         SinglePodLoaded(
@@ -49,7 +57,6 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
       emit(SinglePodError('Something went wrong'));
     }
   }
-
 
 //   // loading
 //   emit(SinglePodLoadingState());
@@ -106,14 +113,14 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
 //   }
 // }
 
-  _checkSubscription(CheckSubscription event,
-      Emitter<SinglePodcastState> emit) async {
+  _checkSubscription(
+      CheckSubscription event, Emitter<SinglePodcastState> emit) async {
     emit(SinglePodSubLoading());
     // delay for sec
     await Future.delayed(const Duration(seconds: 2));
     //check sub
-    DataState<bool>subResult = subscriptionRepository.checkSubscription(
-        urlFeed: event.urlFeed);
+    DataState<bool> subResult =
+        subscriptionRepository.checkSubscription(urlFeed: event.urlFeed);
     // if there is no error
     if (subResult is DataSuccess) {
       // check if subscribed or not
@@ -123,21 +130,56 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
       } else {
         emit(SinglePodUnSubscribed());
       }
-    }else{
+    } else {
       emit(SinglePodSubFailed('something went wrong'));
       await Future.delayed(const Duration(seconds: 1));
       emit(SinglePodUnSubscribed());
-
     }
   }
 
- _loadFromFeed(LoadPodcastFromFeed event, Emitter<SinglePodcastState> emit) async{
+  _loadFromFeed(
+      LoadPodcastFromFeed event, Emitter<SinglePodcastState> emit) async {
     emit(SinglePodLoadingState());
-    DataState<SinglePodcastEntity> result=await podcastRepository.loadPodcastFromFeed(feedUrl: event.feedUrl);
-    if(result is DataSuccess){
+    DataState<SinglePodcastEntity> result =
+        await podcastRepository.loadPodcastFromFeed(feedUrl: event.feedUrl);
+    if (result is DataSuccess) {
+      audioHandler.clearPlayList();
+      List<MediaItem>queueItems=[];
+      for (Episode episode in result.data?.episodes ?? []) {
+        MediaItem mediaItem = MediaItem(
+          id: episode.guid,
+          title: episode.title,
+          duration: episode.duration,
+          artist: episode.author,
+          artUri: Uri.parse(episode.imageUrl!),
+          genre: result.data?.genres?.first?.name??'',
+          displayDescription: episode.description,
+          extras: {
+            'url':episode.contentUrl,
+            'link':episode.contentUrl,
+            'imageUrl':episode.imageUrl
+          }
+        );
+        queueItems.add(mediaItem);
+      }
+      locator<MyAudioHandler>().addQueueItems(queueItems);
       emit(SinglePodLoaded(result.data!, []));
-    }else{
+    } else {
       emit(SinglePodSubFailed('SomeThing went wrong'));
+    }
+  }
+
+  _loadPlayList(LoadPlayListForPlayer event, Emitter<SinglePodcastState> emit) {
+    audioHandler.clearPlayList();
+    for (Episode episode in event.entity.episodes ?? []) {
+      MediaItem mediaItem = MediaItem(
+        id: episode.title,
+        title: episode.title,
+        duration: episode.duration,
+        artist: episode.author,
+        artUri: Uri.parse(episode.imageUrl!),
+        genre: event.entity.genres!.first.name,
+      );
     }
   }
 }

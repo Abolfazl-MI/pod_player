@@ -50,3 +50,10 @@ final class LoadPodcastFromFeed extends SinglePodcastEvent {
   @override
   List<Object?> get props => [feedUrl];
 }
+
+final class LoadPlayListForPlayer extends SinglePodcastEvent {
+  final SinglePodcastEntity entity;
+  LoadPlayListForPlayer(this.entity);
+  @override
+  List<Object?> get props => [];
+}

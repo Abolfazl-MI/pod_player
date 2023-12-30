@@ -47,6 +47,10 @@ dependencies:
   equatable: 2.0.5
   rxdart: ^0.27.7
   flutter_html: ^3.0.0-beta.2
+  just_audio: ^0.9.36
+  audio_service: ^0.18.12
+  audio_video_progress_bar: ^2.0.1
+  dio: ^5.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

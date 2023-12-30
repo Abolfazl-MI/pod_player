@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pod_player/app/config/router/route_names.dart';
 import 'package:pod_player/app/core/services/getit.dart';
+import 'package:pod_player/data/providers/data_source/local/audio_service/audio_service.dart';
+import 'package:pod_player/data/providers/data_source/local/audio_service/audio_service.dart';
 import 'package:pod_player/data/providers/data_source/local/connectivity/connectivity_provider.dart';
 import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
@@ -39,6 +41,7 @@ class ApplicationRouter {
               create: (context) => SinglePodcastBloc(
                 subscriptionRepository: locator<SubscriptionRepository>(),
                 podcastRepository: locator<PodcastRepository>(),
+                audioHandler: locator<MyAudioHandler>()
               ),
             )
           ],
@@ -48,6 +51,7 @@ class ApplicationRouter {
           create: (context) => SinglePodcastBloc(
             subscriptionRepository: locator<SubscriptionRepository>(),
             podcastRepository: locator<PodcastRepository>(),
+            audioHandler: locator<MyAudioHandler>()
           ),
           child: PodcastSingleScreen(),
         ),

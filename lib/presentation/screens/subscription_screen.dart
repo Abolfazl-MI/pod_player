@@ -67,25 +67,23 @@ class _SubscriptionsState extends State<Subscriptions> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Subscriptions'),
-        ),
-        drawer: DrawerWidget(drawerKey: drawerKey),
-        body: BlocBuilder<SearchPodcastBloc, SearchState>(
-          builder: (context, state) {
-            return switch (state) {
-              SubscriptionInitialState() => Container(),
-              SubscriptionLoadingState() => _body(state, size, context),
-              SubscriptionLoadedState() => _body(state, size, context),
-              //TODO: implement the time out and try again error
-              SubscriptionFailedState() => Center(
-                  child: Text('failed ${state.error}'),
-                )
-            };
-          },
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Subscriptions'),
+      ),
+      drawer: DrawerWidget(drawerKey: drawerKey),
+      body: BlocBuilder<SearchPodcastBloc, SearchState>(
+        builder: (context, state) {
+          return switch (state) {
+            SubscriptionInitialState() => Container(),
+            SubscriptionLoadingState() => _body(state, size, context),
+            SubscriptionLoadedState() => _body(state, size, context),
+            //TODO: implement the time out and try again error
+            SubscriptionFailedState() => Center(
+                child: Text('failed ${state.error}'),
+              )
+          };
+        },
       ),
     );
   }

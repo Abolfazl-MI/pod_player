@@ -24,58 +24,56 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return SafeArea(
-      child: Scaffold(
-        key: drawerKey,
-        drawer: DrawerWidget(drawerKey: drawerKey),
-        appBar: AppBar(
-          title: const Text('PodPlayer'),
-        ),
-        body: BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
-          return switch (state) {
-            NoInternetConnection() => Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.signal_wifi_connected_no_internet_4_outlined,
-                      size: 50,
-                    ),
-                    const Text('No Internet Connection'),
-                    TextButton(
-                      onPressed: () {
-                        context.read<HomeCubit>().loadHomeFeed();
-                      },
-                      child: const Text('Try again'),
-                    )
-                  ],
-                ),
-              ),
-            HomeLoadingState() => const Center(
-                  child: Column(
+    return Scaffold(
+      key: drawerKey,
+      drawer: DrawerWidget(drawerKey: drawerKey),
+      appBar: AppBar(
+        title: const Text('PodPlayer'),
+      ),
+      body: BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
+        return switch (state) {
+          NoInternetConnection() => Center(
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircularProgressIndicator(
-                    color: Colors.red,
+                  const Icon(
+                    Icons.signal_wifi_connected_no_internet_4_outlined,
+                    size: 50,
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Loading...',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  const Text('No Internet Connection'),
+                  TextButton(
+                    onPressed: () {
+                      context.read<HomeCubit>().loadHomeFeed();
+                    },
+                    child: const Text('Try again'),
                   )
                 ],
-              )),
-            HomeLoadedState() =>
-              state.subs.isEmpty ? const EmptyState() : _body(state, size),
-            HomeErrorState() => const Center(
-                child: Text('error'),
               ),
-            HomeInitialState() => Container()
-          };
-        }),
-      ),
+            ),
+          HomeLoadingState() => const Center(
+                child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(
+                  color: Colors.red,
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'Loading...',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                )
+              ],
+            )),
+          HomeLoadedState() =>
+            state.subs.isEmpty ? const EmptyState() : _body(state, size),
+          HomeErrorState() => const Center(
+              child: Text('error'),
+            ),
+          HomeInitialState() => Container()
+        };
+      }),
     );
   }
 
