@@ -51,6 +51,7 @@ dependencies:
   audio_service: ^0.18.12
   audio_video_progress_bar: ^2.0.1
   dio: ^5.4.0
+  permission_handler: ^11.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
