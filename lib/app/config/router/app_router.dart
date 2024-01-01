@@ -5,7 +5,7 @@ import 'package:pod_player/app/core/services/getit.dart';
 import 'package:pod_player/data/providers/data_source/local/audio_service/audio_service.dart';
 import 'package:pod_player/data/providers/data_source/local/audio_service/audio_service.dart';
 import 'package:pod_player/data/providers/data_source/local/connectivity/connectivity_provider.dart';
-import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
+import 'package:pod_player/domain/entities/single_podcast/single_podcast_entity.dart';
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
 import 'package:pod_player/presentation/blocs/home_cubit/home_cubti.dart';

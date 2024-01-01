@@ -1,7 +1,7 @@
 import 'package:pod_player/app/core/resources/data_state.dart';
 import 'package:pod_player/data/models/singlePodcast/single_podcast_info_model.dart';
 import 'package:pod_player/data/providers/data_source/local/podcast_provider/podcast_provider.dart';
-import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
+import 'package:pod_player/domain/entities/single_podcast/single_podcast_entity.dart';
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:podcast_search/podcast_search.dart';
 

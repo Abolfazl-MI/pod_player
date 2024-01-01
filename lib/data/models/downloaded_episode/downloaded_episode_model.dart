@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
-import 'package:pod_player/domain/entities/downloaded%20episode/downloaded_episode_entity.dart';
+import 'package:pod_player/domain/entities/downloaded_episode/downloaded_episode_entity.dart';
 
 part 'downloaded_episode_model.g.dart';
 

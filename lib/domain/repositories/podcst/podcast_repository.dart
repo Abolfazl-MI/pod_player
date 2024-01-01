@@ -1,5 +1,5 @@
 import 'package:pod_player/app/core/resources/data_state.dart';
-import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
+import 'package:pod_player/domain/entities/single_podcast/single_podcast_entity.dart';
 import 'package:podcast_search/podcast_search.dart' as podcast;
 
 abstract interface class PodcastRepository {
