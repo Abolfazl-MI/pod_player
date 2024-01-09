@@ -8,6 +8,8 @@ import 'package:pod_player/app/config/router/route_names.dart';
 import 'package:pod_player/app/core/services/getit.dart';
 import 'package:pod_player/data/models/downloaded_episode/downloaded_episode_model.dart';
 import 'package:pod_player/domain/entities/single_podcast/single_podcast_entity.dart';
+import 'package:pod_player/presentation/blocs/download_cubit/downloader.state.dart';
+import 'package:pod_player/presentation/blocs/download_cubit/downloader_cubit.dart';
 import 'package:pod_player/presentation/blocs/player/player_controller.dart';
 import 'package:pod_player/presentation/blocs/podcast_single/single_podcast_bloc.dart';
 import 'package:pod_player/presentation/widgets/draggableSheet.dart';
@@ -176,10 +178,9 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
                 Episode episode = state.singlePodcastEntity.episodes![index];
                 return Card(
                   child: ListTile(
-                    subtitle:
-                        BlocBuilder<SinglePodcastBloc, SinglePodcastState>(
+                    subtitle: BlocBuilder<DownloaderCubit, DownloaderState>(
                       builder: (context, state) {
-                        if (state is SinglePodDownloadLoading &&
+                        if (state is DownloaderLoading &&
                             state.id == episode.guid) {
                           return const LinearProgressIndicator(
                             color: Colors.red,
@@ -219,8 +220,8 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
                                     '');
                             log(data.toString());
                             context
-                                .read<SinglePodcastBloc>()
-                                .add(DownloadSingleEpisodeEvent(data));
+                                .read<DownloaderCubit>()
+                                .downloadEpisode(data);
                           },
                         ),
                       ],

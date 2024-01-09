@@ -35,13 +35,9 @@ class DownloadEpisodeRepositoryImpl implements DownloadEpisodeRepository {
       // check if folder not exists created it
       if (await appDir.exists() == false) {
         await appDir.create();
-        // sub folder with the episode title
-        // check if episode title folder not exists to create
-        if (await subDir.exists() == false) {
-          await subDir.create();
-        }
+        
       }
-      return DataSuccess('${subDir.path}/$fileName');
+      return DataSuccess('${appDir.path}/$fileName');
     } catch (e) {
       return const DataFailed('Something went wrong');
     }

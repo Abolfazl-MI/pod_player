@@ -65,25 +65,3 @@ final class SinglePodSubFailed extends SinglePodcastState {
   List<Object?> get props => [];
 }
 
-final class SinglePodDownloadLoading extends SinglePodcastState {
-  final String id;
-
-  SinglePodDownloadLoading(this.id);
-  @override
-  List<Object?> get props => [id];
-}
-
-final class SinglePodDownloadSucceed extends SinglePodcastState {
-  @override
-  // TODO: implement props
-  List<Object?> get props => [];
-}
-
-final class SinglePodDownloadFailed extends SinglePodcastState {
-  final String error;
-
-  SinglePodDownloadFailed(this.error);
-  @override
-  // TODO: implement props
-  List<Object?> get props => [error];
-}

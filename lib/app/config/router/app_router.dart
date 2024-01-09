@@ -9,6 +9,7 @@ import 'package:pod_player/domain/entities/single_podcast/single_podcast_entity.
 import 'package:pod_player/domain/repositories/download/download_episode_repository.dart';
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
+import 'package:pod_player/presentation/blocs/download_cubit/downloader_cubit.dart';
 import 'package:pod_player/presentation/blocs/home_cubit/home_cubti.dart';
 import 'package:pod_player/presentation/blocs/podcast_single/single_podcast_bloc.dart';
 import 'package:pod_player/presentation/blocs/search/search_podcast_bloc.dart';
@@ -40,21 +41,29 @@ class ApplicationRouter {
             ),
             BlocProvider<SinglePodcastBloc>(
               create: (context) => SinglePodcastBloc(
-                  subscriptionRepository: locator<SubscriptionRepository>(),
-                  podcastRepository: locator<PodcastRepository>(),
-                  audioHandler: locator<MyAudioHandler>(),
-                  downloadEpisodeRepository:
-                      locator<DownloadEpisodeRepository>()),
+                subscriptionRepository: locator<SubscriptionRepository>(),
+                podcastRepository: locator<PodcastRepository>(),
+                audioHandler: locator<MyAudioHandler>(),
+              ),
             )
           ],
           child: const SinglePodInfoScreen(),
         ),
-    RouteNames.podcastSingle: (context) => BlocProvider(
-          create: (context) => SinglePodcastBloc(
-              subscriptionRepository: locator<SubscriptionRepository>(),
-              podcastRepository: locator<PodcastRepository>(),
-              audioHandler: locator<MyAudioHandler>(),
-              downloadEpisodeRepository: locator<DownloadEpisodeRepository>()),
+    RouteNames.podcastSingle: (context) => MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => SinglePodcastBloc(
+                subscriptionRepository: locator<SubscriptionRepository>(),
+                podcastRepository: locator<PodcastRepository>(),
+                audioHandler: locator<MyAudioHandler>(),
+              ),
+            ),
+            BlocProvider(
+              create: (context) => DownloaderCubit(
+                downloadEpisodeRepository: locator<DownloadEpisodeRepository>(),
+              ),
+            )
+          ],
           child: PodcastSingleScreen(),
         ),
     RouteNames.playerScreen: (context) => PlayerScreen()

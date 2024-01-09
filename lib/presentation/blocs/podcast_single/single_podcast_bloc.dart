@@ -26,18 +26,17 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
   final SubscriptionRepository subscriptionRepository;
   final PodcastRepository podcastRepository;
   final MyAudioHandler audioHandler;
-  final DownloadEpisodeRepository downloadEpisodeRepository;
+ 
   SinglePodcastBloc(
       {required this.subscriptionRepository,
       required this.podcastRepository,
       required this.audioHandler,
-      required this.downloadEpisodeRepository})
+      })
       : super(SinglePodInitialState()) {
     on<LoadPodcastDetial>(_loadDetails);
     on<CheckSubscription>(_checkSubscription);
     on<LoadPodcastFromFeed>(_loadFromFeed);
-    on<LoadPlayListForPlayer>(_loadPlayList);
-    on<DownloadSingleEpisodeEvent>(_hadleDownload);
+    
   }
 
   void _loadDetails(
@@ -189,18 +188,5 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
     }
   }
 
-  _hadleDownload(DownloadSingleEpisodeEvent event,
-      Emitter<SinglePodcastState> emit) async {
-    emit(SinglePodDownloadLoading(event.data.id));
 
-    DownloadEpisodeModel downloadEpisodeModel = event.data;
-    DataState<bool> downloadEpisodeResult = await downloadEpisodeRepository
-        .saveEpisode(episodeData: downloadEpisodeModel);
-    if (downloadEpisodeResult is DataFailed) {
-      emit(SinglePodDownloadFailed(
-          downloadEpisodeResult.error ?? 'SomeThing went wrong'));
-    } else {
-      log('downloaded');
-    }
-  }
 }
