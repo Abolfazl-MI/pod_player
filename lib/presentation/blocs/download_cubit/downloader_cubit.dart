@@ -11,7 +11,7 @@ class DownloaderCubit extends Cubit<DownloaderState> {
   final DownloadEpisodeRepository downloadEpisodeRepository;
   DownloaderCubit({required this.downloadEpisodeRepository})
       : super(DownloaderInitial());
-
+  String downloadedId = '';
   downloadEpisode(DownloadEpisodeModel data) async {
     emit(DownloaderLoading(data.id));
 
@@ -20,9 +20,16 @@ class DownloaderCubit extends Cubit<DownloaderState> {
     if (downloadEpisodeResult is DataFailed) {
       emit(DownloaderFail(
           downloadEpisodeResult.error ?? 'SomeThing went wrong'));
+      return;
     } else {
       log('downloaded');
       emit(DownloaderSuccess(data: data.toEntity()));
+      downloadedId = data.id;
+      return;
     }
+  }
+
+  cancelDownload() {
+    downloadEpisodeRepository.cancelDownload();
   }
 }

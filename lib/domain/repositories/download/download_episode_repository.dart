@@ -5,4 +5,6 @@ abstract interface class DownloadEpisodeRepository {
   Future<DataState<bool>> saveEpisode(
       {required DownloadEpisodeModel episodeData});
   DataState<String> readAllSavedEpisodes();
+
+  void cancelDownload();
 }

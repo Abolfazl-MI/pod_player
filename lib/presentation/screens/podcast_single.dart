@@ -101,166 +101,179 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
 
   _body(Size size, SinglePodLoaded state, BuildContext context) {
     SinglePodcastEntity singlePodcastEntity = state.singlePodcastEntity;
-    return CustomScrollView(
-      slivers: [
-        SliverList(
-          delegate: SliverChildListDelegate(
-            [
-              Container(
-                width: size.width,
-                height: size.height * 0.3,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: NetworkImage(
-                      singlePodcastEntity.image!,
+    return BlocListener<DownloaderCubit, DownloaderState>(
+      listener: (context, state) {
+        if (state is DownloaderSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                  'episode ${state.data.episodeTitle} has been downloaded ')));
+        } else if (state is DownloaderFail) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(state.error)));
+        }
+      },
+      child: CustomScrollView(
+        slivers: [
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                Container(
+                  width: size.width,
+                  height: size.height * 0.3,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.fill,
+                      image: NetworkImage(
+                        singlePodcastEntity.image!,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundImage:
-                              NetworkImage(singlePodcastEntity.image!),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        SizedBox(
-                          width: size.width * 0.5,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(singlePodcastEntity.podcastName ?? '',
-                                  maxLines: 12),
-                              Text(singlePodcastEntity.artistName ?? '',
-                                  maxLines: 12),
-                              Visibility(
-                                visible:
-                                    singlePodcastEntity.releaseDate != null,
-                                child: Text(
-                                    '${singlePodcastEntity.releaseDate?.year ?? ''}/${singlePodcastEntity.releaseDate?.month}${singlePodcastEntity.releaseDate?.day}'),
-                              )
-                            ],
+                const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage:
+                                NetworkImage(singlePodcastEntity.image!),
                           ),
-                        ),
-                      ],
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          SizedBox(
+                            width: size.width * 0.5,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(singlePodcastEntity.podcastName ?? '',
+                                    maxLines: 12),
+                                Text(singlePodcastEntity.artistName ?? '',
+                                    maxLines: 12),
+                                Visibility(
+                                  visible:
+                                      singlePodcastEntity.releaseDate != null,
+                                  child: Text(
+                                      '${singlePodcastEntity.releaseDate?.year ?? ''}/${singlePodcastEntity.releaseDate?.month}${singlePodcastEntity.releaseDate?.day}'),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Html(
+                    data: singlePodcastEntity.description,
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+              ],
+            ),
+          ),
+          SliverPadding(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  Episode episode = state.singlePodcastEntity.episodes![index];
+                  return Card(
+                    child: ListTile(
+                      subtitle: BlocBuilder<DownloaderCubit, DownloaderState>(
+                        builder: (context, state) {
+                          if (state is DownloaderLoading &&
+                              state.id == episode.guid) {
+                            return const LinearProgressIndicator(
+                              color: Colors.red,
+                            );
+                          } else {
+                            return SizedBox.shrink();
+                          }
+                        },
+                      ),
+                      title: Text(episode.title),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.play_arrow),
+                            onPressed: () {
+                              // debugPrint(singlePodcastEntity.episodes.toString());
+                              List<Episode> episodes =
+                                  singlePodcastEntity.episodes!;
+                              // debugPrint(episodes[index].);
+                              locator<PlayerController>()
+                                  .playFromPlaylist(index);
+                              Navigator.of(context).pushNamed(
+                                  RouteNames.playerScreen,
+                                  arguments: episodes[index]);
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.download),
+                            onPressed: () async {
+                              // log(episode..toString());
+                              DownloadEpisodeModel data = DownloadEpisodeModel(
+                                  id: episode.guid,
+                                  downloadLink: episode.link!,
+                                  fileName: '${episode.title}.mp3',
+                                  episodeTitle: state.singlePodcastEntity
+                                          .episodes?[index].title ??
+                                      '');
+                              log(data.toString());
+                              await context
+                                  .read<DownloaderCubit>()
+                                  .downloadEpisode(data);
+                            },
+                          ),
+                        ],
+                      ),
                     ),
+                  );
+                },
+                childCount: state.singlePodcastEntity.episodes!.length,
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 10,
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Container(
+              width: size.width,
+              height: size.height * 0.08,
+              // color: Colors.black,
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.podcasts),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      'PodPlayer',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    )
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Html(
-                  data: singlePodcastEntity.description,
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-            ],
-          ),
-        ),
-        SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                Episode episode = state.singlePodcastEntity.episodes![index];
-                return Card(
-                  child: ListTile(
-                    subtitle: BlocBuilder<DownloaderCubit, DownloaderState>(
-                      builder: (context, state) {
-                        if (state is DownloaderLoading &&
-                            state.id == episode.guid) {
-                          return const LinearProgressIndicator(
-                            color: Colors.red,
-                          );
-                        } else {
-                          return SizedBox.shrink();
-                        }
-                      },
-                    ),
-                    title: Text(episode.title),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.play_arrow),
-                          onPressed: () {
-                            // debugPrint(singlePodcastEntity.episodes.toString());
-                            List<Episode> episodes =
-                                singlePodcastEntity.episodes!;
-                            // debugPrint(episodes[index].);
-                            locator<PlayerController>().playFromPlaylist(index);
-                            Navigator.of(context).pushNamed(
-                                RouteNames.playerScreen,
-                                arguments: episodes[index]);
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.download),
-                          onPressed: () async {
-                            // log(episode..toString());
-                            DownloadEpisodeModel data = DownloadEpisodeModel(
-                                id: episode.guid,
-                                downloadLink: episode.link!,
-                                fileName: '${episode.title}.mp3',
-                                episodeTitle: state.singlePodcastEntity
-                                        .episodes?[index].title ??
-                                    '');
-                            log(data.toString());
-                            context
-                                .read<DownloaderCubit>()
-                                .downloadEpisode(data);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-              childCount: state.singlePodcastEntity.episodes!.length,
             ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: SizedBox(
-            height: 10,
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Container(
-            width: size.width,
-            height: size.height * 0.08,
-            // color: Colors.black,
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.podcasts),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    'PodPlayer',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  )
-                ],
-              ),
-            ),
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 }

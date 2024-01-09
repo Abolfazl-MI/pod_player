@@ -17,16 +17,17 @@ final class DownloaderLoading extends DownloaderState {
 }
 
 final class DownloaderSuccess extends DownloaderState {
-final  DownloadedEpisodeEntity data;
+  final DownloadedEpisodeEntity data;
 
   DownloaderSuccess({required this.data});
-  List<Object?> get props => [];
+  @override
+  List<Object?> get props => [data];
 }
 
 final class DownloaderFail extends DownloaderState {
   final String error;
 
   DownloaderFail(this.error);
-
+  @override
   List<Object?> get props => [error];
 }

@@ -35,7 +35,6 @@ class DownloadEpisodeRepositoryImpl implements DownloadEpisodeRepository {
       // check if folder not exists created it
       if (await appDir.exists() == false) {
         await appDir.create();
-        
       }
       return DataSuccess('${appDir.path}/$fileName');
     } catch (e) {
@@ -85,6 +84,11 @@ class DownloadEpisodeRepositoryImpl implements DownloadEpisodeRepository {
     } catch (e) {
       return DataFailed('something went wrong');
     }
+  }
+
+  @override
+  void cancelDownload() {
+    downloadService.cancelReq();
   }
 }
 /*  try {

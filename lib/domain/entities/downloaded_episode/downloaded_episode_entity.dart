@@ -1,6 +1,7 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
-class DownloadedEpisodeEntity {
+class DownloadedEpisodeEntity extends Equatable {
   // file name
   final String fileName;
   // file download link
@@ -15,4 +16,9 @@ class DownloadedEpisodeEntity {
       required this.downloadLink,
       this.fileDir,
       required this.episodeTitle});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props =>
+      [fileName, downloadLink, id, fileDir, episodeTitle];
 }
