@@ -1,8 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pod_player/app/config/router/router.dart';
-import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
+import 'package:pod_player/domain/entities/single_podcast/single_podcast_entity.dart';
 import 'package:pod_player/presentation/blocs/podcast_single/single_podcast_bloc.dart';
 import 'package:pod_player/presentation/blocs/subscribe/subscription_cubit.dart';
 import 'package:pod_player/presentation/widgets/draggableSheet.dart';
@@ -83,31 +82,26 @@ class _SinglePodInfoScreenState extends State<SinglePodInfoScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     // print(item.feedUrl);
-    return SafeArea(
-      child: BlocConsumer<SinglePodcastBloc, SinglePodcastState>(
-        builder: (context, state) {
-          print(state);
+    return BlocConsumer<SinglePodcastBloc, SinglePodcastState>(
+      builder: (context, state) {
+        print(state);
 
-          return Scaffold(
+        return Scaffold(
+            appBar: AppBar(
+              title: state is SinglePodLoaded
+                  ? Text(state.singlePodcastEntity.trackCensoredName ?? '')
+                  : null,
+            ),
+            body: _handleBodyState(state, MediaQuery.of(context).size));
+      },
+      listener: (context, state) {
+        String feedUrl =
+            (ModalRoute.of(context)!.settings.arguments as Item).feedUrl!;
 
-              appBar: AppBar(
-                title: state is SinglePodLoaded
-                    ? Text(state.singlePodcastEntity.trackCensoredName ?? '')
-                    : null,
-              ),
-              body: _handleBodyState(state, MediaQuery.of(context).size));
-        },
-        listener: (context, state) {
-          String feedUrl =
-              (ModalRoute.of(context)!.settings.arguments as Item).feedUrl!;
-
-          if (state is SinglePodLoaded) {
-            context
-                .read<SubscriptionCubit>()
-                .checkSubscription(urlFeed: feedUrl);
-          }
-        },
-      ),
+        if (state is SinglePodLoaded) {
+          context.read<SubscriptionCubit>().checkSubscription(urlFeed: feedUrl);
+        }
+      },
     );
   }
 
@@ -216,7 +210,7 @@ class _SinglePodInfoScreenState extends State<SinglePodInfoScreen> {
                 ),
                 BlocConsumer<SubscriptionCubit, SubscriptionState>(
                   listener: (context, state) {
-                    if(state ==SubscriptionState.error){
+                    if (state == SubscriptionState.error) {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         content: Text('Something went wrong try again later'),
                       ));

@@ -6,6 +6,7 @@ import 'package:pod_player/data/providers/data_source/local/audio_service/audio_
 import 'package:pod_player/data/providers/data_source/local/audio_service/audio_service.dart';
 import 'package:pod_player/data/providers/data_source/local/connectivity/connectivity_provider.dart';
 import 'package:pod_player/domain/entities/single_podcast/single_podcast_entity.dart';
+import 'package:pod_player/domain/repositories/download/download_episode_repository.dart';
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
 import 'package:pod_player/presentation/blocs/home_cubit/home_cubti.dart';
@@ -39,20 +40,21 @@ class ApplicationRouter {
             ),
             BlocProvider<SinglePodcastBloc>(
               create: (context) => SinglePodcastBloc(
-                subscriptionRepository: locator<SubscriptionRepository>(),
-                podcastRepository: locator<PodcastRepository>(),
-                audioHandler: locator<MyAudioHandler>()
-              ),
+                  subscriptionRepository: locator<SubscriptionRepository>(),
+                  podcastRepository: locator<PodcastRepository>(),
+                  audioHandler: locator<MyAudioHandler>(),
+                  downloadEpisodeRepository:
+                      locator<DownloadEpisodeRepository>()),
             )
           ],
           child: const SinglePodInfoScreen(),
         ),
     RouteNames.podcastSingle: (context) => BlocProvider(
           create: (context) => SinglePodcastBloc(
-            subscriptionRepository: locator<SubscriptionRepository>(),
-            podcastRepository: locator<PodcastRepository>(),
-            audioHandler: locator<MyAudioHandler>()
-          ),
+              subscriptionRepository: locator<SubscriptionRepository>(),
+              podcastRepository: locator<PodcastRepository>(),
+              audioHandler: locator<MyAudioHandler>(),
+              downloadEpisodeRepository: locator<DownloadEpisodeRepository>()),
           child: PodcastSingleScreen(),
         ),
     RouteNames.playerScreen: (context) => PlayerScreen()

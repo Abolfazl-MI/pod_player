@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:bloc/bloc.dart';
@@ -8,8 +9,10 @@ import 'package:meta/meta.dart';
 import 'package:pod_player/app/core/params/subscribe_param.dart';
 import 'package:pod_player/app/core/resources/data_state.dart';
 import 'package:pod_player/app/core/services/getit.dart';
+import 'package:pod_player/data/models/downloaded_episode/downloaded_episode_model.dart';
 import 'package:pod_player/data/providers/data_source/local/audio_service/audio_service.dart';
-import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
+import 'package:pod_player/domain/entities/single_podcast/single_podcast_entity.dart';
+import 'package:pod_player/domain/repositories/download/download_episode_repository.dart';
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
 import 'package:pod_player/presentation/blocs/player/player_controller.dart';
@@ -23,16 +26,18 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
   final SubscriptionRepository subscriptionRepository;
   final PodcastRepository podcastRepository;
   final MyAudioHandler audioHandler;
-
+  final DownloadEpisodeRepository downloadEpisodeRepository;
   SinglePodcastBloc(
       {required this.subscriptionRepository,
       required this.podcastRepository,
-      required this.audioHandler})
+      required this.audioHandler,
+      required this.downloadEpisodeRepository})
       : super(SinglePodInitialState()) {
     on<LoadPodcastDetial>(_loadDetails);
     on<CheckSubscription>(_checkSubscription);
     on<LoadPodcastFromFeed>(_loadFromFeed);
     on<LoadPlayListForPlayer>(_loadPlayList);
+    on<DownloadSingleEpisodeEvent>(_hadleDownload);
   }
 
   void _loadDetails(
@@ -43,9 +48,10 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
     if (result is DataSuccess) {
       DataState<List<Item>> simillarItems =
           await podcastRepository.loadSimilarPodcasts(
-              genre: event.item.primaryGenreName ??
-                  result.data?.genres?.first.name ??
-                  'podcast');
+        genre: event.item.primaryGenreName ??
+            result.data?.genres?.first.name ??
+            'podcast',
+      );
 
       emit(
         SinglePodLoaded(
@@ -140,26 +146,26 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
   _loadFromFeed(
       LoadPodcastFromFeed event, Emitter<SinglePodcastState> emit) async {
     emit(SinglePodLoadingState());
+    // TODO handle the downloaded episodes
     DataState<SinglePodcastEntity> result =
         await podcastRepository.loadPodcastFromFeed(feedUrl: event.feedUrl);
     if (result is DataSuccess) {
       audioHandler.clearPlayList();
-      List<MediaItem>queueItems=[];
+      List<MediaItem> queueItems = [];
       for (Episode episode in result.data?.episodes ?? []) {
         MediaItem mediaItem = MediaItem(
-          id: episode.guid,
-          title: episode.title,
-          duration: episode.duration,
-          artist: episode.author,
-          artUri: Uri.parse(episode.imageUrl!),
-          genre: result.data?.genres?.first?.name??'',
-          displayDescription: episode.description,
-          extras: {
-            'url':episode.contentUrl,
-            'link':episode.contentUrl,
-            'imageUrl':episode.imageUrl
-          }
-        );
+            id: episode.guid,
+            title: episode.title,
+            duration: episode.duration,
+            artist: episode.author,
+            artUri: Uri.parse(episode.imageUrl ?? ''),
+            genre: result.data?.genres?.first?.name ?? '',
+            displayDescription: episode.description,
+            extras: {
+              'url': episode.contentUrl,
+              'link': episode.contentUrl,
+              'imageUrl': episode.imageUrl
+            });
         queueItems.add(mediaItem);
       }
       locator<MyAudioHandler>().addQueueItems(queueItems);
@@ -180,6 +186,21 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
         artUri: Uri.parse(episode.imageUrl!),
         genre: event.entity.genres!.first.name,
       );
+    }
+  }
+
+  _hadleDownload(DownloadSingleEpisodeEvent event,
+      Emitter<SinglePodcastState> emit) async {
+    emit(SinglePodDownloadLoading(event.data.id));
+
+    DownloadEpisodeModel downloadEpisodeModel = event.data;
+    DataState<bool> downloadEpisodeResult = await downloadEpisodeRepository
+        .saveEpisode(episodeData: downloadEpisodeModel);
+    if (downloadEpisodeResult is DataFailed) {
+      emit(SinglePodDownloadFailed(
+          downloadEpisodeResult.error ?? 'SomeThing went wrong'));
+    } else {
+      log('downloaded');
     }
   }
 }

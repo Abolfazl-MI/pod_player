@@ -57,3 +57,11 @@ final class LoadPlayListForPlayer extends SinglePodcastEvent {
   @override
   List<Object?> get props => [];
 }
+
+final class DownloadSingleEpisodeEvent extends SinglePodcastEvent {
+  DownloadSingleEpisodeEvent(this.data);
+
+  @override
+  List<Object?> get props => [data];
+  final DownloadEpisodeModel data;
+}

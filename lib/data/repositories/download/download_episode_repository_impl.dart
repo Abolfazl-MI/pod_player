@@ -4,10 +4,12 @@ import 'package:dio/dio.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pod_player/app/core/resources/data_state.dart';
 import 'package:pod_player/data/models/downloaded_episode/downloaded_episode_model.dart';
-import 'package:pod_player/data/providers/data_source/local/downloade/downloader_service.dart';
-import 'package:pod_player/domain/repositories/download/episode_save_repository.dart';
+import 'package:pod_player/data/providers/data_source/remote/downloade/downloader_service.dart';
+import 'package:pod_player/domain/repositories/download/download_episode_repository.dart';
 
-class SaveEpisodeRepositoryImpl implements SaveEpisodeRepository {
+class DownloadEpisodeRepositoryImpl implements DownloadEpisodeRepository {
+  final String _appDirPath = '/storage/emulated/0/podPlayer';
+
   final DownloaderService downloadService;
   Future<DataState<String>> _getPathForFile(
       String fileName, String episodeTitle) async {
@@ -45,11 +47,11 @@ class SaveEpisodeRepositoryImpl implements SaveEpisodeRepository {
     }
   }
 
-  SaveEpisodeRepositoryImpl({required this.downloadService});
+  DownloadEpisodeRepositoryImpl({required this.downloadService});
 
   @override
   Future<DataState<bool>> saveEpisode(
-      {required DownloadedEpisodeModel episodeData}) async {
+      {required DownloadEpisodeModel episodeData}) async {
     try {
       // try to download the episode from url and gets its bytes
       Response response =
@@ -74,6 +76,18 @@ class SaveEpisodeRepositoryImpl implements SaveEpisodeRepository {
       return const DataFailed('NetWork error ');
     } catch (e) {
       return const DataFailed('SomeThing went wrong');
+    }
+  }
+
+  @override
+  DataState<String> readAllSavedEpisodes() {
+    try {
+      Directory appDir = Directory(_appDirPath);
+      var result = appDir.listSync();
+      print(result.toString());
+      return DataSuccess('done');
+    } catch (e) {
+      return DataFailed('something went wrong');
     }
   }
 }

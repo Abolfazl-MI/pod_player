@@ -1,9 +1,13 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pod_player/app/config/router/route_names.dart';
 import 'package:pod_player/app/core/services/getit.dart';
-import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
+import 'package:pod_player/data/models/downloaded_episode/downloaded_episode_model.dart';
+import 'package:pod_player/domain/entities/single_podcast/single_podcast_entity.dart';
 import 'package:pod_player/presentation/blocs/player/player_controller.dart';
 import 'package:pod_player/presentation/blocs/podcast_single/single_podcast_bloc.dart';
 import 'package:pod_player/presentation/widgets/draggableSheet.dart';
@@ -23,10 +27,7 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       context.read<SinglePodcastBloc>().add(LoadPodcastFromFeed(
-          ModalRoute
-              .of(context)!
-              .settings
-              .arguments as String));
+          ModalRoute.of(context)!.settings.arguments as String));
     });
   }
 
@@ -60,13 +61,11 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
             ,
             appBar: state is SinglePodLoaded
                 ? AppBar(
-              title: Text(state.singlePodcastEntity.podcastName ?? ''),
-            )
+                    title: Text(state.singlePodcastEntity.podcastName ?? ''),
+                  )
                 : null,
             body:
-            _handleBodyState(state, MediaQuery
-                .of(context)
-                .size, context));
+                _handleBodyState(state, MediaQuery.of(context).size, context));
       },
     );
   }
@@ -78,10 +77,10 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
         child: state is SinglePodLoadingState
             ? _loadingState(size)
             : state is SinglePodError
-            ? _failedToLoadState(state.error)
-            : state is SinglePodLoaded
-            ? _body(size, state, context)
-            : Container());
+                ? _failedToLoadState(state.error)
+                : state is SinglePodLoaded
+                    ? _body(size, state, context)
+                    : Container());
   }
 
   _loadingState(Size size) {
@@ -129,7 +128,7 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
                         CircleAvatar(
                           radius: 30,
                           backgroundImage:
-                          NetworkImage(singlePodcastEntity.image!),
+                              NetworkImage(singlePodcastEntity.image!),
                         ),
                         const SizedBox(
                           width: 10,
@@ -145,12 +144,9 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
                                   maxLines: 12),
                               Visibility(
                                 visible:
-                                singlePodcastEntity.releaseDate != null,
+                                    singlePodcastEntity.releaseDate != null,
                                 child: Text(
-                                    '${singlePodcastEntity.releaseDate?.year ??
-                                        ''}/${singlePodcastEntity.releaseDate
-                                        ?.month}${singlePodcastEntity
-                                        .releaseDate?.day}'),
+                                    '${singlePodcastEntity.releaseDate?.year ?? ''}/${singlePodcastEntity.releaseDate?.month}${singlePodcastEntity.releaseDate?.day}'),
                               )
                             ],
                           ),
@@ -176,10 +172,23 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
           padding: EdgeInsets.symmetric(horizontal: 10),
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
-                  (context, index) {
+              (context, index) {
                 Episode episode = state.singlePodcastEntity.episodes![index];
                 return Card(
                   child: ListTile(
+                    subtitle:
+                        BlocBuilder<SinglePodcastBloc, SinglePodcastState>(
+                      builder: (context, state) {
+                        if (state is SinglePodDownloadLoading &&
+                            state.id == episode.guid) {
+                          return const LinearProgressIndicator(
+                            color: Colors.red,
+                          );
+                        } else {
+                          return SizedBox.shrink();
+                        }
+                      },
+                    ),
                     title: Text(episode.title),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -189,7 +198,7 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
                           onPressed: () {
                             // debugPrint(singlePodcastEntity.episodes.toString());
                             List<Episode> episodes =
-                            singlePodcastEntity.episodes!;
+                                singlePodcastEntity.episodes!;
                             // debugPrint(episodes[index].);
                             locator<PlayerController>().playFromPlaylist(index);
                             Navigator.of(context).pushNamed(
@@ -199,7 +208,20 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
                         ),
                         IconButton(
                           icon: Icon(Icons.download),
-                          onPressed: () {},
+                          onPressed: () async {
+                            // log(episode..toString());
+                            DownloadEpisodeModel data = DownloadEpisodeModel(
+                                id: episode.guid,
+                                downloadLink: episode.link!,
+                                fileName: '${episode.title}.mp3',
+                                episodeTitle: state.singlePodcastEntity
+                                        .episodes?[index].title ??
+                                    '');
+                            log(data.toString());
+                            context
+                                .read<SinglePodcastBloc>()
+                                .add(DownloadSingleEpisodeEvent(data));
+                          },
                         ),
                       ],
                     ),
@@ -230,10 +252,7 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
                   ),
                   Text(
                     'PodPlayer',
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .bodySmall,
+                    style: Theme.of(context).textTheme.bodySmall,
                   )
                 ],
               ),
@@ -257,9 +276,7 @@ class PlayerBottemSheet extends StatelessWidget {
         builder: (context, value, child) {
           return Container(
             decoration: BoxDecoration(
-                color: Theme
-                    .of(context)
-                    .cardColor,
+                color: Theme.of(context).cardColor,
                 boxShadow: [
                   BoxShadow(
                       color: Colors.black,
@@ -267,18 +284,11 @@ class PlayerBottemSheet extends StatelessWidget {
                       blurStyle: BlurStyle.inner)
                 ]),
             padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
-            height: MediaQuery
-                .of(context)
-                .size
-                .height * 0.07,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height * 0.07,
             // color: Colors.red,
             child: Row(
               children: [
-
                 /// image
                 Container(
                   decoration: BoxDecoration(
@@ -286,14 +296,8 @@ class PlayerBottemSheet extends StatelessWidget {
                           image: NetworkImage(value.artUri.toString()),
                           fit: BoxFit.cover)),
                   // color: Colors.green,
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width * 0.2,
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height * 0.07,
+                  width: MediaQuery.of(context).size.width * 0.2,
+                  height: MediaQuery.of(context).size.height * 0.07,
                 ),
                 SizedBox(
                   width: 5,
@@ -326,19 +330,21 @@ class PlayerBottemSheet extends StatelessWidget {
                     //   icon: Icon(Icons.play_arrow),
                     // ),
                     ValueListenableBuilder(
-                        valueListenable: locator<PlayerController>()
-                            .buttonNotifier,
+                        valueListenable:
+                            locator<PlayerController>().buttonNotifier,
                         builder: (context, value, child) {
-                          switch(value){
+                          switch (value) {
                             case ButtonState.loading:
                               return SizedBox();
                             case ButtonState.paused:
-                              return IconButton(onPressed: (){}, icon: Icon(Icons.play_arrow));
+                              return IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(Icons.play_arrow));
                             case ButtonState.playing:
-                              return IconButton(onPressed: (){}, icon: Icon(Icons.pause));
+                              return IconButton(
+                                  onPressed: () {}, icon: Icon(Icons.pause));
                           }
-                        }
-                    ),
+                        }),
                     IconButton(onPressed: () {}, icon: Icon(Icons.skip_next))
                   ],
                 )

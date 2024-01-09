@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:pod_player/app/core/resources/data_state.dart';
-import 'package:pod_player/domain/entities/subscription/single_podcast_entity.dart';
+import 'package:pod_player/domain/entities/single_podcast/single_podcast_entity.dart';
 import 'package:pod_player/domain/entities/subscription/subscription_entity.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
 
