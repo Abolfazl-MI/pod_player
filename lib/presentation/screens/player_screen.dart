@@ -3,8 +3,12 @@ import 'dart:developer';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:pod_player/app/core/services/getit.dart';
+import 'package:pod_player/data/models/downloaded_episode/downloaded_episode_model.dart';
+import 'package:pod_player/presentation/blocs/download_cubit/downloader.state.dart';
+import 'package:pod_player/presentation/blocs/download_cubit/downloader_cubit.dart';
 import 'package:pod_player/presentation/blocs/player/player_controller.dart';
 import 'package:podcast_search/podcast_search.dart';
 
@@ -30,6 +34,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
   @override
   void initState() {
     // TODO: implement initState
+    // print(ModalRoute.of(context)!.settings.arguments.toString());
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() {
         episode = ModalRoute.of(context)!.settings.arguments as Episode;
@@ -55,6 +60,62 @@ class _PlayerScreenState extends State<PlayerScreen> {
             Navigator.of(context).pop();
           },
         ),
+        actions: [
+          BlocBuilder<DownloaderCubit, DownloaderState>(
+            builder: (context, state) {
+              // return IconButton(
+              //     onPressed: () async {
+              //       //     DownloadEpisodeModel data = DownloadEpisodeModel(
+              //       //         id: episode.guid,
+              //       //         downloadLink: episode.link!,
+              //       //         fileName: '${episode.title}.mp3',
+              //       //         episodeTitle: state.singlePodcastEntity
+              //       //                 .episodes?[index].title ??
+              //       //             '');
+              //       //     log(data.toString());
+              //       //     await context
+              //       //         .read<DownloaderCubit>()
+              //       //         .downloadEpisode(data);
+              //       //   },
+              //       DownloadEpisodeModel data = DownloadEpisodeModel(
+              //           id: episode!.guid!,
+              //           downloadLink: episode!.contentUrl!,
+              //           fileName: '${episode!.title}.mp3',
+              //           episodeTitle: episode?.title ?? '');
+              //       await context.read<DownloaderCubit>().downloadEpisode(data);
+              //     },
+              //     icon: Icon(Icons.download));
+              if (state is DownloaderLoading) {
+                return SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.red,
+                  ),
+                );
+              }
+              if (state is DownloaderFail) {
+                return Icon(Icons.file_download_off_outlined);
+              }
+              return IconButton(
+                onPressed: () async {
+                  DownloadEpisodeModel data = DownloadEpisodeModel(
+                      id: episode!.guid!,
+                      downloadLink: episode!.contentUrl!,
+                      fileName: '${episode!.title}.mp3',
+                      episodeTitle: episode?.title ?? '');
+                  await context.read<DownloaderCubit>().downloadEpisode(data);
+                },
+                icon: Icon(
+                  Icons.file_download_rounded,
+                ),
+              );
+            },
+          ),
+          SizedBox(
+            width: 10,
+          )
+        ],
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -72,7 +133,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         // color: Colors.yellow,
                         decoration: BoxDecoration(
                             image: DecorationImage(
-                                image: NetworkImage(episode!.imageUrl!))),
+                          image: NetworkImage(
+                            episode?.imageUrl ?? '',
+                          ),
+                          onError: (exception, stackTrace) =>
+                              Icon(Icons.image_not_supported),
+                        )),
                       ),
 
                       const SizedBox(
@@ -83,7 +149,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         padding:
                             EdgeInsets.symmetric(horizontal: size.width * 0.1),
                         child: Html(
-                          data: episode!.description,
+                          data: episode?.description ?? '',
                         ),
                       ),
                       const SizedBox(
@@ -299,23 +365,22 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       icon: const Icon(Icons.skip_next, size: 40));
                 }),
             IconButton(
-                onPressed: () {
-                  Duration currentDuration = locator<PlayerController>()
-                      .progressNotifier
-                      .value
-                      .current;
-                  Duration total =
-                      locator<PlayerController>().progressNotifier.value.total;
-                  Duration tenSecondLater =
-                      currentDuration + const Duration(seconds: 10);
-                  if (currentDuration < total) {
-                    locator<PlayerController>().seek(tenSecondLater);
-                  }
-                },
-                icon: const Icon(
-                  Icons.fast_forward,
-                  size: 40,
-                )),
+              onPressed: () {
+                Duration currentDuration =
+                    locator<PlayerController>().progressNotifier.value.current;
+                Duration total =
+                    locator<PlayerController>().progressNotifier.value.total;
+                Duration tenSecondLater =
+                    currentDuration + const Duration(seconds: 10);
+                if (currentDuration < total) {
+                  locator<PlayerController>().seek(tenSecondLater);
+                }
+              },
+              icon: const Icon(
+                Icons.fast_forward,
+                size: 40,
+              ),
+            ),
           ],
         ),
         // SizedBox(height: ,)

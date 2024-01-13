@@ -189,18 +189,6 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
                   Episode episode = state.singlePodcastEntity.episodes![index];
                   return Card(
                     child: ListTile(
-                      subtitle: BlocBuilder<DownloaderCubit, DownloaderState>(
-                        builder: (context, state) {
-                          if (state is DownloaderLoading &&
-                              state.id == episode.guid) {
-                            return const LinearProgressIndicator(
-                              color: Colors.red,
-                            );
-                          } else {
-                            return SizedBox.shrink();
-                          }
-                        },
-                      ),
                       title: Text(episode.title),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -208,34 +196,51 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
                           IconButton(
                             icon: Icon(Icons.play_arrow),
                             onPressed: () {
-                              // debugPrint(singlePodcastEntity.episodes.toString());
-                              List<Episode> episodes =
-                                  singlePodcastEntity.episodes!;
-                              // debugPrint(episodes[index].);
+                              // // debugPrint(singlePodcastEntity.episodes.toString());
+                              // List<Episode> episodes =
+                              //     singlePodcastEntity.episodes!;
+                              // // debugPrint(episodes[index].);
+                              // locator<PlayerController>()
+                              //     .playFromPlaylist(index);
+                              // Navigator.of(context).pushNamed(
+                              //     RouteNames.playerScreen,
+                              //     arguments: episodes[index]);
+                              // log(episode.contentUrl.toString());
+                              // Navigator.of(context).pushNamed(
+                              //     RouteNames.playerScreen,
+                              //     arguments: episode);
+                              // var result = locator<PlayerController>()
+                              //     .playlistNotifier
+                              //     .value;
+                              // log(result.toString());
+
+                              // stop the player
+                              locator<PlayerController>().stop();
+                              // replay the selected index
                               locator<PlayerController>()
                                   .playFromPlaylist(index);
                               Navigator.of(context).pushNamed(
                                   RouteNames.playerScreen,
-                                  arguments: episodes[index]);
+                                  arguments: episode);
                             },
                           ),
-                          IconButton(
-                            icon: Icon(Icons.download),
-                            onPressed: () async {
-                              // log(episode..toString());
-                              DownloadEpisodeModel data = DownloadEpisodeModel(
-                                  id: episode.guid,
-                                  downloadLink: episode.link!,
-                                  fileName: '${episode.title}.mp3',
-                                  episodeTitle: state.singlePodcastEntity
-                                          .episodes?[index].title ??
-                                      '');
-                              log(data.toString());
-                              await context
-                                  .read<DownloaderCubit>()
-                                  .downloadEpisode(data);
-                            },
-                          ),
+                          // IconButton(
+                          //   icon: Icon(Icons.download),
+                          //   onPressed: () async {
+                          //     // log(episode..toString());
+                          //     DownloadEpisodeModel data = DownloadEpisodeModel(
+                          //         id: episode.guid,
+                          //         downloadLink: episode.link!,
+                          //         fileName: '${episode.title}.mp3',
+                          //         episodeTitle: state.singlePodcastEntity
+                          //                 .episodes?[index].title ??
+                          //             '');
+                          //     log(data.toString());
+                          //     await context
+                          //         .read<DownloaderCubit>()
+                          //         .downloadEpisode(data);
+                          //   },
+                          // ),
                         ],
                       ),
                     ),

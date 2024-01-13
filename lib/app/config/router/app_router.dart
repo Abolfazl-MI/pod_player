@@ -68,7 +68,9 @@ class ApplicationRouter {
           ],
           child: PodcastSingleScreen(),
         ),
-    RouteNames.playerScreen: (context) => PlayerScreen(),
+    RouteNames.playerScreen: (context) => BlocProvider<DownloaderCubit>(
+      create:(context)=> DownloaderCubit(downloadEpisodeRepository: locator<DownloadEpisodeRepository>()),
+      child: PlayerScreen()),
     RouteNames.episodes: (context) => BlocProvider(
         create: (context) => EpisodeCubit(downloadEpisodeRepository: locator<DownloadEpisodeRepository>()),
       child: DownloadedEpisodeScreen()),

@@ -47,10 +47,13 @@ class PlayerController {
   // }
 
   void _listenToChangeInPlaylist() {
-    log('playlist changin....');
+    log('playlist changing....');
     _audioHandler.queue.listen((playlist) {
-      log('playlist =>....${playlist.toString()}');
-
+      // log(
+      //   'playlist =>....${playlist.toString()}',
+      //   name: 'playlist logger',
+      // );
+      log('playlist length=>${playlist.length}');
       if (playlist.isEmpty) return;
       final newList = playlist.map((item) => item).toList();
       playlistNotifier.value = newList;
