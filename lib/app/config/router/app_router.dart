@@ -10,10 +10,12 @@ import 'package:pod_player/domain/repositories/download/download_episode_reposit
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
 import 'package:pod_player/presentation/blocs/download_cubit/downloader_cubit.dart';
+import 'package:pod_player/presentation/blocs/episode/episode_cubit.dart';
 import 'package:pod_player/presentation/blocs/home_cubit/home_cubti.dart';
 import 'package:pod_player/presentation/blocs/podcast_single/single_podcast_bloc.dart';
 import 'package:pod_player/presentation/blocs/search/search_podcast_bloc.dart';
 import 'package:pod_player/presentation/blocs/subscribe/subscription_cubit.dart';
+import 'package:pod_player/presentation/screens/episodes.dart';
 import 'package:pod_player/presentation/screens/player_screen.dart';
 import 'package:pod_player/presentation/screens/podcast_single.dart';
 
@@ -66,6 +68,9 @@ class ApplicationRouter {
           ],
           child: PodcastSingleScreen(),
         ),
-    RouteNames.playerScreen: (context) => PlayerScreen()
+    RouteNames.playerScreen: (context) => PlayerScreen(),
+    RouteNames.episodes: (context) => BlocProvider(
+        create: (context) => EpisodeCubit(downloadEpisodeRepository: locator<DownloadEpisodeRepository>()),
+      child: DownloadedEpisodeScreen()),
   };
 }

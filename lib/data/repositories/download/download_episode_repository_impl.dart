@@ -75,12 +75,12 @@ class DownloadEpisodeRepositoryImpl implements DownloadEpisodeRepository {
   }
 
   @override
-  DataState<String> readAllSavedEpisodes() {
+  DataState<List<File>> readAllSavedEpisodes() {
     try {
       Directory appDir = Directory(_appDirPath);
       var result = appDir.listSync();
-      print(result.toString());
-      return DataSuccess('done');
+      List<File> files = result.map((e) => File(e.path)).toList();
+      return DataSuccess(files);
     } catch (e) {
       return DataFailed('something went wrong');
     }
