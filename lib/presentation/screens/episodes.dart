@@ -6,6 +6,7 @@ import 'package:pod_player/presentation/blocs/episode/episode_state.dart';
 import 'package:pod_player/presentation/blocs/player/player_controller.dart';
 import 'package:pod_player/presentation/screens/podcast_single.dart';
 import 'package:pod_player/presentation/widgets/drawer_widget.dart';
+import 'package:pod_player/presentation/widgets/player_bottom_widget.dart';
 import 'package:podcast_search/podcast_search.dart';
 
 class DownloadedEpisodeScreen extends StatefulWidget {
@@ -34,16 +35,16 @@ class DownloadedEpisodeScreenState extends State<DownloadedEpisodeScreen> {
         // automaticallyImplyLeading: false,
         title: const Text('Episodes'),
       ),
-      // bottomNavigationBar: ValueListenableBuilder(
-      //         valueListenable: locator<PlayerController>().playState,
-      //         builder: (context, value, child) {
-      //           if (!value) {
-      //             return SizedBox.shrink();
-      //           } else {
-      //             return PlayerBottemSheet();
-      //           }
-      //         },
-      //       ),
+      bottomNavigationBar: ValueListenableBuilder(
+        valueListenable: locator<PlayerController>().playState,
+        builder: (context, value, child) {
+          if (!value) {
+            return const SizedBox.shrink();
+          } else {
+            return const PlayerBottomSheet();
+          }
+        },
+      ),
       drawer: DrawerWidget(drawerKey: drawerKey),
       body: BlocBuilder<EpisodeCubit, EpisodeState>(
         builder: (context, state) {

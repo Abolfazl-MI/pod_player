@@ -13,7 +13,6 @@ List<DrawerOption> drawerOptions = [
   DrawerOption(title: 'Home', iconData: CupertinoIcons.house),
   DrawerOption(title: 'Episodes', iconData: Icons.podcasts),
   DrawerOption(title: 'Subscriptions', iconData: Icons.category_outlined),
-  DrawerOption(title: 'Settings', iconData: CupertinoIcons.settings),
 ];
 
 class DrawerWidget extends StatelessWidget {
@@ -38,7 +37,7 @@ class DrawerWidget extends StatelessWidget {
                         case 'Home':
                           routeName = RouteNames.home;
                         case 'Episodes':
-                          routeName=RouteNames.episodes;
+                          routeName = RouteNames.episodes;
                         default:
                           'Home';
                       }

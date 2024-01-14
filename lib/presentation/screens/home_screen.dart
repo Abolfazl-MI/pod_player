@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pod_player/app/config/router/route_names.dart';
+import 'package:pod_player/app/core/services/getit.dart';
 import 'package:pod_player/presentation/blocs/home_cubit/home_cubti.dart';
 import 'package:pod_player/presentation/blocs/home_cubit/home_state.dart';
+import 'package:pod_player/presentation/blocs/player/player_controller.dart';
 import 'package:pod_player/presentation/widgets/drawer_widget.dart';
+import 'package:pod_player/presentation/widgets/player_bottom_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,6 +28,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      bottomNavigationBar: ValueListenableBuilder(
+        valueListenable: locator<PlayerController>().playState,
+        builder: (context, value, child) {
+          if (!value) {
+            return const SizedBox.shrink();
+          } else {
+            return const PlayerBottomSheet();
+          }
+        },
+      ),
       key: drawerKey,
       drawer: DrawerWidget(drawerKey: drawerKey),
       appBar: AppBar(
@@ -88,10 +101,8 @@ class _HomeScreenState extends State<HomeScreen> {
               delegate: SliverChildBuilderDelegate((context, index) {
                 return InkWell(
                   onTap: () {
-                    Navigator.of(context).pushNamed(
-                      RouteNames.podcastSingle,
-                      arguments: state.subs[index].subscriptionUrl
-                    );
+                    Navigator.of(context).pushNamed(RouteNames.podcastSingle,
+                        arguments: state.subs[index].subscriptionUrl);
                   },
                   child: Card(
                     child: Column(
