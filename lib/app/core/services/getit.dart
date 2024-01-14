@@ -21,7 +21,7 @@ GetIt locator = GetIt.instance;
 Future<void> setupLocator(Isar isar) async {
   // dio instance
   locator.registerSingleton<Dio>(
-      Dio(BaseOptions(connectTimeout: Duration(seconds: 3),followRedirects: true)));
+      Dio(BaseOptions(followRedirects: true)));
   locator
       .registerSingleton<DownloaderService>(DownloaderService(locator<Dio>()));
 

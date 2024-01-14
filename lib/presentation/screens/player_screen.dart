@@ -61,30 +61,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
           },
         ),
         actions: [
-          BlocBuilder<DownloaderCubit, DownloaderState>(
+          BlocConsumer<DownloaderCubit, DownloaderState>(
+            listener: (context, state) {
+              if (state is DownloaderFail) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.error),
+                  ),
+                );
+              }
+            },
             builder: (context, state) {
-              // return IconButton(
-              //     onPressed: () async {
-              //       //     DownloadEpisodeModel data = DownloadEpisodeModel(
-              //       //         id: episode.guid,
-              //       //         downloadLink: episode.link!,
-              //       //         fileName: '${episode.title}.mp3',
-              //       //         episodeTitle: state.singlePodcastEntity
-              //       //                 .episodes?[index].title ??
-              //       //             '');
-              //       //     log(data.toString());
-              //       //     await context
-              //       //         .read<DownloaderCubit>()
-              //       //         .downloadEpisode(data);
-              //       //   },
-              //       DownloadEpisodeModel data = DownloadEpisodeModel(
-              //           id: episode!.guid!,
-              //           downloadLink: episode!.contentUrl!,
-              //           fileName: '${episode!.title}.mp3',
-              //           episodeTitle: episode?.title ?? '');
-              //       await context.read<DownloaderCubit>().downloadEpisode(data);
-              //     },
-              //     icon: Icon(Icons.download));
               if (state is DownloaderLoading) {
                 return SizedBox(
                   width: 24,
@@ -97,10 +84,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
               if (state is DownloaderFail) {
                 return Icon(Icons.file_download_off_outlined);
               }
+              if (state is DownloaderSuccess) {
+                return Icon(Icons.download_done_rounded);
+              }
               return IconButton(
                 onPressed: () async {
                   DownloadEpisodeModel data = DownloadEpisodeModel(
-                      id: episode!.guid!,
+                      id: episode!.guid,
                       downloadLink: episode!.contentUrl!,
                       fileName: '${episode!.title}.mp3',
                       episodeTitle: episode?.title ?? '');

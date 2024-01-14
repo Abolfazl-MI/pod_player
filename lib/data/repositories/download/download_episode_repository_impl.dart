@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -67,7 +68,8 @@ class DownloadEpisodeRepositoryImpl implements DownloadEpisodeRepository {
       }
       // return unknown error
       return const DataFailed('Failed to download episode');
-    } on DioException {
+    } on DioException catch (e) {
+      log('DioException=>${e.toString()}');
       return const DataFailed('NetWork error ');
     } catch (e) {
       return const DataFailed('SomeThing went wrong');
