@@ -5,6 +5,7 @@ import 'package:pod_player/app/core/resources/debouncer.dart';
 import 'package:pod_player/app/core/services/getit.dart';
 import 'package:pod_player/presentation/blocs/player/player_controller.dart';
 import 'package:pod_player/presentation/blocs/search/search_podcast_bloc.dart';
+import 'package:pod_player/presentation/widgets/cached_image.dart';
 
 import 'package:pod_player/presentation/widgets/drawer_widget.dart';
 import 'package:pod_player/presentation/widgets/player_bottom_widget.dart';
@@ -72,15 +73,15 @@ class _SubscriptionsState extends State<Subscriptions> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       bottomNavigationBar: ValueListenableBuilder(
-              valueListenable: locator<PlayerController>().playState,
-              builder: (context, value, child) {
-                if (!value) {
-                  return const SizedBox.shrink();
-                } else {
-                  return const PlayerBottomSheet();
-                }
-              },
-            ),
+        valueListenable: locator<PlayerController>().playState,
+        builder: (context, value, child) {
+          if (!value) {
+            return const SizedBox.shrink();
+          } else {
+            return const PlayerBottomSheet();
+          }
+        },
+      ),
       appBar: AppBar(
         title: const Text('Subscriptions'),
       ),
@@ -231,10 +232,8 @@ class SearchItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).pushNamed(
-          RouteNames.podcastSingleInfo,
-          arguments: item
-        );
+        Navigator.of(context)
+            .pushNamed(RouteNames.podcastSingleInfo, arguments: item);
       },
       child: Card(
         // child: Padding(
@@ -264,19 +263,18 @@ class SearchItem extends StatelessWidget {
           children: [
             // TODO use cached network image
             Expanded(
-              child: Hero(
-                tag: 'artwork${item.trackId}',
-                child: Container(
-                  // color: Colors.greenf,
-                  decoration: BoxDecoration(
-                      image: item.thumbnailArtworkUrl != null
-                          ? DecorationImage(
-                              fit: BoxFit.cover,
-                              image: NetworkImage(item.bestArtworkUrl!))
-                          : null),
-                  // color: Colors.green
-                ),
+              child: CachedImage(
+                imageUrl: item.bestArtworkUrl!,
               ),
+              // child: Container(
+              //   // color: Colors.greenf,
+              //   decoration: BoxDecoration(
+              //       image: item.thumbnailArtworkUrl != null
+              //           ? DecorationImage(
+              //               fit: BoxFit.cover,
+              //               image: NetworkImage(item.bestArtworkUrl!))
+              //           : null),
+              // color: Colors.green
             ),
             const SizedBox(
               height: 10,

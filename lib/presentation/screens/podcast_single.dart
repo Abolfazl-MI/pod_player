@@ -8,6 +8,7 @@ import 'package:pod_player/presentation/blocs/download_cubit/downloader.state.da
 import 'package:pod_player/presentation/blocs/download_cubit/downloader_cubit.dart';
 import 'package:pod_player/presentation/blocs/player/player_controller.dart';
 import 'package:pod_player/presentation/blocs/podcast_single/single_podcast_bloc.dart';
+import 'package:pod_player/presentation/widgets/cached_image.dart';
 import 'package:pod_player/presentation/widgets/player_bottom_widget.dart';
 import 'package:podcast_search/podcast_search.dart';
 
@@ -113,18 +114,23 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
           SliverList(
             delegate: SliverChildListDelegate(
               [
-                Container(
+                // Container(
+                //   width: size.width,
+                //   height: size.height * 0.3,
+                //   decoration: BoxDecoration(
+                //     image: DecorationImage(
+                //       fit: BoxFit.fill,
+                //       image: NetworkImage(
+                //         singlePodcastEntity.image!,
+                //       ),
+                //     ),
+                //   ),
+                CachedImage(
+                  imageUrl: singlePodcastEntity.image!,
                   width: size.width,
                   height: size.height * 0.3,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      fit: BoxFit.fill,
-                      image: NetworkImage(
-                        singlePodcastEntity.image!,
-                      ),
-                    ),
-                  ),
                 ),
+
                 const SizedBox(
                   height: 10,
                 ),
@@ -278,5 +284,3 @@ class _PodcastSingleScreenState extends State<PodcastSingleScreen> {
     );
   }
 }
-
-

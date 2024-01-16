@@ -5,6 +5,7 @@ import 'package:pod_player/app/core/services/getit.dart';
 import 'package:pod_player/presentation/blocs/home_cubit/home_cubti.dart';
 import 'package:pod_player/presentation/blocs/home_cubit/home_state.dart';
 import 'package:pod_player/presentation/blocs/player/player_controller.dart';
+import 'package:pod_player/presentation/widgets/cached_image.dart';
 import 'package:pod_player/presentation/widgets/drawer_widget.dart';
 import 'package:pod_player/presentation/widgets/player_bottom_widget.dart';
 
@@ -109,15 +110,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  image: NetworkImage(
-                                    state.subs[index].artWorkUrl!,
-                                  ),
-                                  fit: BoxFit.fill),
-                            ),
+                          child: CachedImage(
+                            imageUrl: state.subs[index].artWorkUrl!,
                           ),
+                          // child: Container(
+                          //   decoration: BoxDecoration(
+                          //     image: DecorationImage(
+                          //         image: NetworkImage(
+                          //           state.subs[index].artWorkUrl!,
+                          //         ),
+                          //         fit: BoxFit.fill),
+                          //   ),
+                          // ),
                         ),
                         const SizedBox(
                           height: 10,

@@ -13,6 +13,7 @@ import 'package:pod_player/domain/repositories/download/download_episode_reposit
 import 'package:pod_player/presentation/blocs/download_cubit/downloader.state.dart';
 import 'package:pod_player/presentation/blocs/download_cubit/downloader_cubit.dart';
 import 'package:pod_player/presentation/blocs/player/player_controller.dart';
+import 'package:pod_player/presentation/widgets/cached_image.dart';
 
 import 'package:podcast_search/podcast_search.dart';
 
@@ -166,18 +167,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        Container(
+                        CachedImage(
                           width: size.width * 0.7,
                           height: size.width * 0.7,
-                          // color: Colors.yellow,
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                            image: NetworkImage(
-                              episode?.imageUrl ?? '',
-                            ),
-                            onError: (exception, stackTrace) =>
-                                const Icon(Icons.image_not_supported),
-                          )),
+                          imageUrl: episode?.imageUrl ?? '',
                         ),
 
                         const SizedBox(
@@ -191,39 +184,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                             data: episode?.description ?? '',
                           ),
                         ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Visibility(
-                          visible: ((episode?.description.length ?? 0) > 420),
-                          child: InkWell(
-                            onTap: () {
-                              print(episode!.description.length);
-                              setState(() {
-                                _showFullText = !_showFullText;
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                  border: Border.all(),
-                                  borderRadius: BorderRadius.circular(12)),
-                              // width:150,
-                              // height: 50,
-                              // color: Colors.orange,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.info_outline),
-                                  Text(_showFullText
-                                      ? 'show less'
-                                      : 'show more'),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+
                         const SizedBox(
                           height: 5,
                         )
