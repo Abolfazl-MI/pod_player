@@ -48,8 +48,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
       }).toList();
       log('Files  names in folder =>$filesNames');
       log('Episode current file name =>$podcastName');
-      var res = filesNames.where((element) => element == podcastName).first;
-      log(res);
+      bool contains = filesNames.contains(podcastName);
+      setState(() {
+        hasDownloadedBefore = contains;
+      });
     } else {
       return;
     }
@@ -137,7 +139,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           DownloadEpisodeModel data = DownloadEpisodeModel(
                               id: episode!.guid,
                               downloadLink: episode!.contentUrl!,
-                              fileName: '$fileName.mp3',
+                              fileName: fileName,
                               episodeTitle: episode?.title ?? '');
                           await context
                               .read<DownloaderCubit>()
