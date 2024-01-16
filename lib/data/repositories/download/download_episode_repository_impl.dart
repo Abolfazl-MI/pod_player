@@ -23,16 +23,7 @@ class DownloadEpisodeRepositoryImpl implements DownloadEpisodeRepository {
         await Permission.storage.request();
         await Permission.manageExternalStorage.request();
       }
-
-      /// directory strategy is like this
-      /// we assume that episode title is `life of ceo`
-      /// and the episode which is going to download called `how become ceo.mp3`
-      /// the folder would be this
-      ///  storage/emulated/0/podPlayer/life of ceo/how become ceo.mp3
-
-      // application root dir
       Directory appDir = Directory('/storage/emulated/0/podPlayer');
-      Directory subDir = Directory('${appDir.path}/$episodeTitle');
       // check if folder not exists created it
       if (await appDir.exists() == false) {
         await appDir.create();
@@ -91,6 +82,17 @@ class DownloadEpisodeRepositoryImpl implements DownloadEpisodeRepository {
   @override
   void cancelDownload() {
     downloadService.cancelReq();
+  }
+
+
+  bool hasEpisodeDownloaded(String episodeTitle) {
+    try {
+      
+      bool fileExists = Directory("$_appDirPath/$episodeTitle.mp3").existsSync();
+      return fileExists;
+    } catch (e) {
+      return false;
+    }
   }
 }
 /*  try {

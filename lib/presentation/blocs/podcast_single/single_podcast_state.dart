@@ -18,6 +18,7 @@ final class SinglePodLoaded extends SinglePodcastState {
   final SinglePodcastEntity singlePodcastEntity;
   final List<Item> similarItems;
   final List? downloadedEpisodes;
+  
   SinglePodLoaded(this.singlePodcastEntity, this.similarItems,
       {this.downloadedEpisodes});
 

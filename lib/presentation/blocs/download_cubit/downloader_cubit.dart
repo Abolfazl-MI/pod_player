@@ -31,5 +31,8 @@ class DownloaderCubit extends Cubit<DownloaderState> {
 
   cancelDownload() {
     downloadEpisodeRepository.cancelDownload();
+    emit(DownloaderInitial());
   }
+
+  
 }

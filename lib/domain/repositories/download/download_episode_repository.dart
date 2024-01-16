@@ -9,4 +9,6 @@ abstract interface class DownloadEpisodeRepository {
   DataState<List<File>> readAllSavedEpisodes();
 
   void cancelDownload();
+
+
 }

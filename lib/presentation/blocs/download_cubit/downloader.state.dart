@@ -1,7 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:pod_player/domain/entities/downloaded_episode/downloaded_episode_entity.dart';
 
-sealed class DownloaderState extends Equatable {}
+sealed class DownloaderState extends Equatable {
+  
+}
 
 final class DownloaderInitial extends DownloaderState {
   @override
