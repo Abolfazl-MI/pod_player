@@ -5,6 +5,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 import 'package:pod_player/app/core/params/subscribe_param.dart';
 import 'package:pod_player/app/core/resources/data_state.dart';
@@ -16,6 +17,7 @@ import 'package:pod_player/domain/repositories/download/download_episode_reposit
 import 'package:pod_player/domain/repositories/podcst/podcast_repository.dart';
 import 'package:pod_player/domain/repositories/subscription/subscription_repository.dart';
 import 'package:pod_player/presentation/blocs/player/player_controller.dart';
+import 'package:pod_player/presentation/helpers/createAudioSoruce.dart';
 import 'package:podcast_search/podcast_search.dart';
 
 part 'single_podcast_event.dart';
@@ -26,17 +28,15 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
   final SubscriptionRepository subscriptionRepository;
   final PodcastRepository podcastRepository;
   final MyAudioHandler audioHandler;
- 
-  SinglePodcastBloc(
-      {required this.subscriptionRepository,
-      required this.podcastRepository,
-      required this.audioHandler,
-      })
-      : super(SinglePodInitialState()) {
+
+  SinglePodcastBloc({
+    required this.subscriptionRepository,
+    required this.podcastRepository,
+    required this.audioHandler,
+  }) : super(SinglePodInitialState()) {
     on<LoadPodcastDetial>(_loadDetails);
     on<CheckSubscription>(_checkSubscription);
     on<LoadPodcastFromFeed>(_loadFromFeed);
-    
   }
 
   void _loadDetails(
@@ -150,25 +150,16 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
         await podcastRepository.loadPodcastFromFeed(feedUrl: event.feedUrl);
     if (result is DataSuccess) {
       audioHandler.clearPlayList();
-      List<MediaItem> queueItems = [];
-      for (Episode episode in result.data?.episodes ?? []) {
-        MediaItem mediaItem = MediaItem(
-            id: episode.guid,
-            title: episode.title,
-            duration: episode.duration,
-            artist: episode.author,
-            artUri: Uri.parse(episode.imageUrl ?? ''),
-            genre: result.data?.genres?.first?.name ?? '',
-            displayDescription: episode.description,
-            extras: {
-              'url': episode.contentUrl,
-              'link': episode.contentUrl,
-              'imageUrl': episode.imageUrl
-            });
-        queueItems.add(mediaItem);
-      }
-      locator<MyAudioHandler>().addQueueItems(queueItems);
-      emit(SinglePodLoaded(result.data!, []));
+    
+      // use isolates to create playlist media items in order to pervent app crash
+      CreateAudiSourceParams params = CreateAudiSourceParams(
+          episodes: result.data?.episodes ?? [],
+          genre: result.data?.genres?.first.name ?? '');
+      List<MediaItem> items =
+          await compute<CreateAudiSourceParams, List<MediaItem>>(
+              createAudioSource, params);
+       locator<MyAudioHandler>().addQueueItems(items);
+          emit(SinglePodLoaded(result.data!, []));
     } else {
       emit(SinglePodSubFailed('SomeThing went wrong'));
     }
@@ -187,6 +178,4 @@ class SinglePodcastBloc extends Bloc<SinglePodcastEvent, SinglePodcastState> {
       );
     }
   }
-
-
 }
