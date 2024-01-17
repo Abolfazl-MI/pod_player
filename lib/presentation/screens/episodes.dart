@@ -4,10 +4,8 @@ import 'package:pod_player/app/core/services/getit.dart';
 import 'package:pod_player/presentation/blocs/episode/episode_cubit.dart';
 import 'package:pod_player/presentation/blocs/episode/episode_state.dart';
 import 'package:pod_player/presentation/blocs/player/player_controller.dart';
-import 'package:pod_player/presentation/screens/podcast_single.dart';
 import 'package:pod_player/presentation/widgets/drawer_widget.dart';
 import 'package:pod_player/presentation/widgets/player_bottom_widget.dart';
-import 'package:podcast_search/podcast_search.dart';
 
 class DownloadedEpisodeScreen extends StatefulWidget {
   const DownloadedEpisodeScreen({super.key});
@@ -29,6 +27,7 @@ class DownloadedEpisodeScreenState extends State<DownloadedEpisodeScreen> {
     });
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -56,7 +55,24 @@ class DownloadedEpisodeScreenState extends State<DownloadedEpisodeScreen> {
             );
           }
           if (state is LoadedEpisodeState) {
-            return Container(
+            if (state.downloadedEpisodes.isEmpty) {
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.now_widgets_outlined),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'No Episode Downloaded yet',
+                    ),
+                    Text('Downloads would shown here')
+                  ],
+                ),
+              );
+            }
+            return SizedBox(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               child: ListView.builder(
@@ -70,7 +86,7 @@ class DownloadedEpisodeScreenState extends State<DownloadedEpisodeScreen> {
             );
           }
           if (state is ErrorEpisodeState) {
-            return Center(
+            return const Center(
               child: Text('err'),
             );
           }

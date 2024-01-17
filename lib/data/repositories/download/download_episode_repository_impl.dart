@@ -71,6 +71,10 @@ class DownloadEpisodeRepositoryImpl implements DownloadEpisodeRepository {
   DataState<List<File>> readAllSavedEpisodes() {
     try {
       Directory appDir = Directory(_appDirPath);
+      // check if not exist to create directory
+      if (!appDir.existsSync()) {
+        appDir.createSync();
+      }
       var result = appDir.listSync();
       List<File> files = result.map((e) => File(e.path)).toList();
       return DataSuccess(files);
@@ -84,11 +88,10 @@ class DownloadEpisodeRepositoryImpl implements DownloadEpisodeRepository {
     downloadService.cancelReq();
   }
 
-
   bool hasEpisodeDownloaded(String episodeTitle) {
     try {
-      
-      bool fileExists = Directory("$_appDirPath/$episodeTitle.mp3").existsSync();
+      bool fileExists =
+          Directory("$_appDirPath/$episodeTitle.mp3").existsSync();
       return fileExists;
     } catch (e) {
       return false;
