@@ -24,13 +24,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      
+
       routes: ApplicationRouter.router,
       initialRoute: RouteNames.splash,
       darkTheme: ThemeData.dark(),
       // themeMode: ThemeMode.dark,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xffF25135)),
         useMaterial3: true,
       ),
       // home: const MyHomePage(),
