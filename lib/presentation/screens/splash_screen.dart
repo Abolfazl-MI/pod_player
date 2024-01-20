@@ -16,16 +16,13 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _opacityAnimation;
   @override
   void initState() {
-    rotationController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
-    _rotationAnimation =
-        Tween(begin: 0.0, end: -1.0).animate(rotationController);
-    rotationController.forward();
     super.initState();
-    rotationController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        Navigator.of(context).pushNamed(RouteNames.home);
-      }
+    _navigate();
+  }
+
+  _navigate() async {
+    await Future.delayed(Duration(seconds: 2), () {
+      Navigator.of(context).pushReplacementNamed(RouteNames.home);
     });
   }
 
@@ -35,25 +32,24 @@ class _SplashScreenState extends State<SplashScreen>
       body: Container(
         color: Colors.blue,
         child: Center(
-          child: RotationTransition(
-            turns: _rotationAnimation,
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.podcasts,
-                  size: 100,
-                  color: Colors.white,
+          child: const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 150,
+                height: 150,
+                child: Image(
+                  image: AssetImage('assets/icons/appicon.png'),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  'PodPlayer',
-                  style: TextStyle(color: Colors.white, fontSize: 30),
-                ),
-              ],
-            ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'PodPlayer',
+                style: TextStyle(color: Colors.white, fontSize: 30),
+              ),
+            ],
           ),
         ),
       ),
