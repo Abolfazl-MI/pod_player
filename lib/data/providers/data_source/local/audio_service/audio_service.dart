@@ -36,6 +36,7 @@ class MyAudioHandler extends BaseAudioHandler {
     }
   }
 
+  
   void _notifyAudioHandlerAboutPlaybackEvents() {
     _player.playbackEventStream.listen((PlaybackEvent event) {
       final playing = _player.playing;
@@ -110,6 +111,32 @@ class MyAudioHandler extends BaseAudioHandler {
     final audioSource = mediaItems.map(_createAudioSource);
     if (_playlist.length < mediaItems.length) {
       _playlist.addAll(audioSource.toList());
+    }
+
+    if (queue.value.length < mediaItems.length) {
+      final newQueue = queue.value..addAll(mediaItems);
+      queue.add(newQueue);
+    }
+  }
+
+  Future addQueueItemsFromFiles(List<File> files) async {
+    // creates media item from files
+    List<MediaItem> mediaItems = files.map((File file) {
+      String fileName = (file.path.split('/')[5].split('.')[0]);
+      MediaItem mediaItem = MediaItem(id: file.path, title: fileName);
+      return mediaItem;
+    }).toList();
+    // create audio sources
+    final audioSources = mediaItems
+        .map(
+          (e) => AudioSource.file(
+            e.id,
+            tag: e,
+          ),
+        )
+        .toList();
+    if (_playlist.length < mediaItems.length) {
+      _playlist.addAll(audioSources);
     }
 
     if (queue.value.length < mediaItems.length) {

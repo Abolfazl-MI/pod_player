@@ -60,6 +60,7 @@ class PlayerController {
     });
   }
 
+
   void _listenToPlaybackState() {
     _audioHandler.playbackState.listen((playbackState) {
       final isPlaying = playbackState.playing;
@@ -156,8 +157,8 @@ class PlayerController {
     _audioHandler.seek(position);
   }
 
-  void playFromPlaylist(int index) {
-    _audioHandler.skipToQueueItem(index);
+   playFromPlaylist(int index)async {
+    await _audioHandler.skipToQueueItem(index);
   }
 
   void onPreviousPressed() {

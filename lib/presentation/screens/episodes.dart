@@ -1,11 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_media_metadata/flutter_media_metadata.dart';
 import 'package:pod_player/app/core/services/getit.dart';
 import 'package:pod_player/presentation/blocs/episode/episode_cubit.dart';
 import 'package:pod_player/presentation/blocs/episode/episode_state.dart';
 import 'package:pod_player/presentation/blocs/player/player_controller.dart';
 import 'package:pod_player/presentation/widgets/drawer_widget.dart';
 import 'package:pod_player/presentation/widgets/player_bottom_widget.dart';
+
+import '../../app/config/router/route_names.dart';
 
 class DownloadedEpisodeScreen extends StatefulWidget {
   const DownloadedEpisodeScreen({super.key});
@@ -72,6 +77,11 @@ class DownloadedEpisodeScreenState extends State<DownloadedEpisodeScreen> {
                 ),
               );
             }
+            List<String> fileNames = state.downloadedEpisodes.map((e) {
+              String fullPath = e.path;
+              String fileName = fullPath.split('/')[5].toString().split('.')[0];
+              return fileName;
+            }).toList();
             return SizedBox(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
@@ -79,7 +89,48 @@ class DownloadedEpisodeScreenState extends State<DownloadedEpisodeScreen> {
                 itemCount: state.downloadedEpisodes.length,
                 itemBuilder: (context, index) => Card(
                   child: ListTile(
-                    title: Text('data$index'),
+                    title: Text(fileNames[index]),
+                    trailing: ValueListenableBuilder(
+                        valueListenable: locator<PlayerController>()
+                            .currentSongDetailNotifier,
+                        builder: (ctx, currentSongDetail, child) {
+                          return ValueListenableBuilder(
+                              valueListenable:
+                                  locator<PlayerController>().buttonNotifier,
+                              builder: (context, buttonNotifier, child) {
+                                log(buttonNotifier.toString());
+                                bool isPlaying = buttonNotifier ==
+                                        ButtonState.playing &&
+                                    currentSongDetail.id ==
+                                        state.downloadedEpisodes[index].path;
+
+                                return IconButton(
+                                    onPressed: () async {
+                                      //player controller instance
+                                      PlayerController playerController =
+                                          locator<PlayerController>();
+                                      // check if the selected song is same as playing
+                                      bool isSameSong = playerController
+                                              .playlistNotifier.value[index] ==
+                                          currentSongDetail;
+                                      if (isSameSong) {
+                                        // if playing just pause
+                                        if (isPlaying) {
+                                          playerController.pause();
+                                        } else {
+                                          playerController.play();
+                                        }
+                                      } else {
+                                        await playerController
+                                            .playFromPlaylist(index);
+                                        playerController.play();
+                                      }
+                                    },
+                                    icon: Icon(isPlaying
+                                        ? Icons.pause
+                                        : Icons.play_arrow));
+                              });
+                        }),
                   ),
                 ),
               ),

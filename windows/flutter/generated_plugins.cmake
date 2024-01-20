@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
+  flutter_media_metadata
   isar_flutter_libs
   permission_handler_windows
 )
